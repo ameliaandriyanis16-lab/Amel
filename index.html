@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Smart Nursing Trolley</title>
+<title>Smart Nursing Trolley System</title>
 
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 
@@ -15,7 +15,7 @@
 
 body {
     margin: 0;
-    padding: 15px;
+    padding: 16px;
     font-family: Arial, sans-serif;
     background: #f4f7f9;
     color: #222;
@@ -27,29 +27,30 @@ body {
 }
 
 .header {
-    text-align: center;
     background: white;
     padding: 20px;
-    border-radius: 15px;
-    margin-bottom: 15px;
+    text-align: center;
+    border-radius: 16px;
+    margin-bottom: 16px;
+    box-shadow: 0 3px 12px rgba(0,0,0,.08);
 }
 
 .header h1 {
     margin: 0;
-    font-size: 25px;
+    font-size: 24px;
 }
 
 .header p {
-    margin-bottom: 0;
     color: #666;
+    margin-bottom: 0;
 }
 
 .card {
     background: white;
     padding: 18px;
-    border-radius: 15px;
-    margin-bottom: 15px;
-    box-shadow: 0 3px 10px rgba(0,0,0,.08);
+    border-radius: 16px;
+    margin-bottom: 16px;
+    box-shadow: 0 3px 12px rgba(0,0,0,.08);
 }
 
 h2 {
@@ -58,53 +59,52 @@ h2 {
 
 button {
     width: 100%;
-    border: 0;
-    padding: 14px;
-    margin-top: 9px;
+    border: none;
     border-radius: 10px;
+    padding: 14px;
+    margin-top: 10px;
     font-size: 16px;
     font-weight: bold;
 }
 
-.open {
+.btn-camera {
     background: #1976d2;
     color: white;
 }
 
-.stop {
+.btn-stop {
     background: #d32f2f;
     color: white;
 }
 
-.scan {
+.btn-scan {
     background: #388e3c;
     color: white;
 }
 
-.approve {
+.btn-approve {
     background: #00897b;
     color: white;
 }
 
-.cancel {
-    background: #757575;
+.btn-cancel {
+    background: #777;
     color: white;
 }
 
-.print {
+.btn-print {
     background: #333;
     color: white;
 }
 
 video {
-    display: block;
     width: 100%;
-    height: auto;
-    min-height: 250px;
+    min-height: 260px;
     margin-top: 12px;
     background: black;
     border-radius: 12px;
     object-fit: cover;
+    display: block;
 }
 
 #status {
@@ -116,22 +116,21 @@ video {
 }
 
 #ocrResult {
-    min-height: 60px;
-    padding: 12px;
-    border-radius: 8px;
     background: #f1f1f1;
+    padding: 12px;
+    min-height: 60px;
+    border-radius: 8px;
     white-space: pre-wrap;
-}
-
-.detected-box {
-    padding: 15px;
-    background: #e8f5e9;
-    border-radius: 10px;
-    margin-top: 10px;
 }
 
 .hidden {
     display: none;
+}
+
+.detected {
+    background: #e8f5e9;
+    padding: 15px;
+    border-radius: 10px;
 }
 
 .stock-row {
@@ -146,28 +145,34 @@ video {
     font-weight: bold;
 }
 
-.stock-warning {
+.low {
     color: #d32f2f;
     font-size: 13px;
     margin-top: 4px;
 }
 
-.stock-buttons {
+.stock-control {
     display: flex;
     align-items: center;
     gap: 7px;
 }
 
-.stock-buttons button {
+.stock-control button {
     width: 42px;
-    padding: 8px;
     margin: 0;
+    padding: 8px;
 }
 
-.number {
+.qty {
     min-width: 30px;
     text-align: center;
     font-weight: bold;
+}
+
+label {
+    display: block;
+    font-weight: bold;
+    margin-top: 12px;
 }
 
 input {
@@ -176,12 +181,6 @@ input {
     border: 1px solid #ccc;
     border-radius: 8px;
     margin-top: 5px;
-}
-
-label {
-    display: block;
-    font-weight: bold;
-    margin-top: 12px;
 }
 
 #printArea {
@@ -222,1042 +221,115 @@ label {
 
 <div class="container">
 
-<div class="header">
-    <h1>SMART NURSING TROLLEY SYSTEM</h1>
-    <p>Emergency Drug Inventory System</p>
-</div>
+    <div class="header">
+        <h1>SMART NURSING TROLLEY SYSTEM</h1>
+        <p>Emergency Drug Inventory System</p>
+    </div>
 
 
-<!-- ================= CAMERA ================= -->
+    <!-- CAMERA -->
 
-<div class="card">
+    <div class="card">
 
-<h2>📷 Scan Obat</h2>
+        <h2>📷 Scan Obat</h2>
 
-<button class="open" id="openCamera">
-📷 Buka Kamera
-</button>
+        <button
+            class="btn-camera"
+            id="openCamera">
+            📷 Buka Kamera Belakang
+        </button>
 
-<button class="stop" id="stopCamera">
-⏹️ Matikan Kamera
-</button>
+        <button
+            class="btn-stop"
+            id="stopCamera">
+            ⏹️ Matikan Kamera
+        </button>
 
-<video
-    id="camera"
-    autoplay
-    playsinline
-    muted>
-</video>
+        <video
+            id="camera"
+            autoplay
+            playsinline
+            muted>
+        </video>
 
-<div id="status">
-Kamera belum digunakan
-</div>
+        <div id="status">
+            Kamera belum digunakan
+        </div>
 
-<button class="scan" id="scanButton">
-🔍 Scan Obat
-</button>
+        <button
+            class="btn-scan"
+            id="scanButton">
+            🔍 Scan Obat
+        </button>
 
-</div>
+    </div>
 
 
-<!-- ================= OCR ================= -->
+    <!-- OCR -->
 
-<div class="card">
+    <div class="card">
 
-<h2>📝 Hasil Scan</h2>
+        <h2>📝 Hasil Scan</h2>
 
-<div id="ocrResult">
-Belum ada hasil scan.
-</div>
+        <div id="ocrResult">
+            Belum ada hasil scan.
+        </div>
 
-</div>
+    </div>
 
 
-<!-- ================= DETECTED ================= -->
+    <!-- OBAT TERDETEKSI -->
 
-<div
-class="card hidden"
-id="detectedCard">
+    <div
+        class="card hidden"
+        id="detectedCard">
 
-<h2>💊 Obat Terdeteksi</h2>
+        <h2>💊 Obat Terdeteksi</h2>
 
-<div
-class="detected-box"
-id="detectedMedicine">
-</div>
+        <div
+            class="detected"
+            id="detectedMedicine">
+        </div>
 
-<button
-class="approve"
-id="approveButton">
-✅ Approve & Tambahkan ke Stok
-</button>
+        <button
+            class="btn-approve"
+            id="approveButton">
+            ✅ Approve & Tambahkan ke Stok
+        </button>
 
-<button
-class="cancel"
-id="cancelButton">
-❌ Batal
-</button>
+        <button
+            class="btn-cancel"
+            id="cancelButton">
+            ❌ Batal
+        </button>
 
-</div>
+    </div>
 
 
-<!-- ================= STOCK ================= -->
+    <!-- STOCK -->
 
-<div class="card">
+    <div class="card">
 
-<h2>📦 Stok Obat</h2>
+        <h2>📦 Stok Obat</h2>
 
-<div id="stockList">
-Belum ada obat.
-</div>
+        <div id="stockList">
+            Belum ada obat.
+        </div>
 
-</div>
+    </div>
 
 
-<!-- ================= PRINT ================= -->
+    <!-- PRINT -->
 
-<div class="card">
+    <div class="card">
 
-<h2>🖨️ Print Label</h2>
+        <h2>🖨️ Print Label</h2>
 
-<label>Nama Pasien</label>
+        <label>Nama Pasien</label>
 
-<input
-id="patientName"
-type="text"
-placeholder="Nama pasien">
+        <input
+            id="patientName"
+            type="text"
+            placeholder="Nama pasien">
 
-
-<label>Nama Obat</label>
-
-<input
-id="printMedicine"
-type="text"
-placeholder="Nama obat">
-
-
-<label>Dosis</label>
-
-<input
-id="dose"
-type="text"
-placeholder="Contoh: 5 mg">
-
-
-<button
-class="print"
-id="printButton">
-🖨️ Print Label 58 mm
-</button>
-
-</div>
-
-
-<!-- ================= PRINT AREA ================= -->
-
-<div id="printArea">
-
-<h3>SMART NURSING TROLLEY</h3>
-
-<hr>
-
-<p>
-<strong>Pasien:</strong><br>
-<span id="labelPatient"></span>
-</p>
-
-<p>
-<strong>Obat:</strong><br>
-<span id="labelMedicine"></span>
-</p>
-
-<p>
-<strong>Dosis:</strong><br>
-<span id="labelDose"></span>
-</p>
-
-<p>
-<strong>Waktu:</strong><br>
-<span id="labelTime"></span>
-</p>
-
-<hr>
-
-<p>
-Emergency Drug Inventory
-</p>
-
-</div>
-
-</div>
-
-
-<script>
-
-/* =====================================================
-   CAMERA
-===================================================== */
-
-let cameraStream = null;
-
-const video = document.getElementById("camera");
-
-const status =
-document.getElementById("status");
-
-
-document
-.getElementById("openCamera")
-.addEventListener("click", openCamera);
-
-
-async function openCamera() {
-
-    status.innerText =
-    "⏳ Membuka kamera...";
-
-    try {
-
-        if (
-            !navigator.mediaDevices ||
-            !navigator.mediaDevices.getUserMedia
-        ) {
-
-            status.innerText =
-            "❌ Browser tidak mendukung kamera.";
-
-            return;
-        }
-
-
-        if (cameraStream) {
-
-            cameraStream
-            .getTracks()
-            .forEach(
-                track => track.stop()
-            );
-
-        }
-
-
-        cameraStream =
-        await navigator.mediaDevices.getUserMedia({
-
-            video: true,
-
-            audio: false
-
-        });
-
-
-        video.srcObject =
-        cameraStream;
-
-
-        video.muted = true;
-
-        video.playsInline = true;
-
-
-        await video.play();
-
-
-        status.innerText =
-        "📷 Kamera aktif. Arahkan ke nama obat.";
-
-    }
-
-    catch (error) {
-
-        console.error(error);
-
-        status.innerText =
-        "❌ Kamera gagal: " +
-        error.name;
-
-        if (
-            error.name ===
-            "NotAllowedError"
-        ) {
-
-            alert(
-            "Izin kamera ditolak.\n\n" +
-            "Izinkan kamera untuk website ini di Chrome."
-            );
-
-        }
-
-        else if (
-            error.name ===
-            "NotReadableError"
-        ) {
-
-            alert(
-            "Kamera sedang digunakan aplikasi lain."
-            );
-
-        }
-
-        else if (
-            error.name ===
-            "NotFoundError"
-        ) {
-
-            alert(
-            "Kamera tidak ditemukan."
-            );
-
-        }
-
-    }
-
-}
-
-
-/* =====================================================
-   STOP CAMERA
-===================================================== */
-
-document
-.getElementById("stopCamera")
-.addEventListener(
-    "click",
-    stopCamera
-);
-
-
-function stopCamera() {
-
-    if (cameraStream) {
-
-        cameraStream
-        .getTracks()
-        .forEach(
-            track => track.stop()
-        );
-
-        cameraStream = null;
-
-    }
-
-
-    video.srcObject = null;
-
-    status.innerText =
-    "⏹️ Kamera dimatikan.";
-
-}
-
-
-/* =====================================================
-   FORMULARY
-===================================================== */
-
-const formulary = [
-
-{
-name: "Epinephrine",
-keywords: [
-"EPINEPHRINE",
-"EPINEFRIN",
-"ADRENALINE",
-"ADRENALIN"
-]
-},
-
-{
-name: "Norepinephrine",
-keywords: [
-"NOREPINEPHRINE",
-"NOREPINEFRIN",
-"NORADRENALINE",
-"NORADRENALIN"
-]
-},
-
-{
-name: "Dopamine",
-keywords: [
-"DOPAMINE",
-"DOPAMIN",
-"DOPAMINEHCL",
-"DOPAMINEHYDROCHLORIDE",
-"DOPAMINEHYDROCHLORID"
-]
-},
-
-{
-name: "Dobutamine",
-keywords: [
-"DOBUTAMINE",
-"DOBUTAMIN"
-]
-},
-
-{
-name: "Midazolam",
-keywords: [
-"MIDAZOLAM",
-"MIDAZOLAN",
-"MIDAZOLAMHCL",
-"MIDAZOLAMHYDROCHLORIDE"
-]
-},
-
-{
-name: "Fentanyl",
-keywords: [
-"FENTANYL",
-"FENTANIL",
-"FENTANYLCITRATE",
-"FENTANYLCITRAT",
-"FENTANYLUM"
-]
-},
-
-{
-name: "Ketamine",
-keywords: [
-"KETAMINE",
-"KETAMIN",
-"KETAMINEHCL",
-"KETAMINEHYDROCHLORIDE"
-]
-},
-
-{
-name: "Lidocaine",
-keywords: [
-"LIDOCAINE",
-"LIDOKAIN",
-"LIDOCAINEHCL"
-]
-},
-
-{
-name: "D40",
-keywords: [
-"D40",
-"DEXTROSE40"
-]
-},
-
-{
-name: "Meylon",
-keywords: [
-"MEYLON",
-"SODIUMBICARBONATE",
-"BICARBONATE"
-]
-},
-
-{
-name: "Dexamethasone",
-keywords: [
-"DEXAMETHASONE",
-"DEXAMETASON"
-]
-},
-
-{
-name: "Alkohol 70%",
-keywords: [
-"ALKOHOL70",
-"ALCOHOL70",
-"ETHANOL70"
-]
-}
-
-];
-
-
-/* =====================================================
-   STOCK
-===================================================== */
-
-let stock = {};
-
-try {
-
-    const saved =
-    localStorage.getItem(
-        "smartNursingTrolleyStock"
-    );
-
-    if (saved) {
-
-        stock =
-        JSON.parse(saved);
-
-    }
-
-}
-catch(error) {
-
-    stock = {};
-
-}
-
-
-function saveStock() {
-
-    localStorage.setItem(
-        "smartNursingTrolleyStock",
-        JSON.stringify(stock)
-    );
-
-}
-
-
-/* =====================================================
-   SCAN
-===================================================== */
-
-document
-.getElementById("scanButton")
-.addEventListener(
-    "click",
-    scanMedicine
-);
-
-
-async function scanMedicine() {
-
-    if (!cameraStream) {
-
-        alert(
-        "📷 Buka kamera terlebih dahulu."
-        );
-
-        return;
-    }
-
-
-    if (
-        video.videoWidth === 0 ||
-        video.videoHeight === 0
-    ) {
-
-        alert(
-        "Kamera belum siap. Tunggu beberapa detik."
-        );
-
-        return;
-    }
-
-
-    status.innerText =
-    "📸 Mengambil gambar...";
-
-
-    try {
-
-        const canvas =
-        document.createElement("canvas");
-
-
-        canvas.width =
-        video.videoWidth;
-
-
-        canvas.height =
-        video.videoHeight;
-
-
-        const context =
-        canvas.getContext("2d");
-
-
-        context.drawImage(
-            video,
-            0,
-            0,
-            canvas.width,
-            canvas.height
-        );
-
-
-        status.innerText =
-        "🔍 Membaca tulisan obat...";
-
-
-        const result =
-        await Tesseract.recognize(
-
-            canvas,
-
-            "eng",
-
-            {
-
-                logger: function(info) {
-
-                    if (
-                        info.status ===
-                        "recognizing text"
-                    ) {
-
-                        status.innerText =
-                        "🔍 OCR " +
-                        Math.round(
-                            info.progress * 100
-                        ) +
-                        "%";
-
-                    }
-
-                }
-
-            }
-
-        );
-
-
-        const text =
-        result.data.text
-        .toUpperCase();
-
-
-        document.getElementById(
-            "ocrResult"
-        ).innerText =
-        text ||
-        "Tulisan tidak terbaca.";
-
-
-        const medicine =
-        findMedicine(text);
-
-
-        if (medicine) {
-
-            detectedMedicineName =
-            medicine.name;
-
-
-            document
-            .getElementById(
-                "detectedCard"
-            )
-            .classList
-            .remove("hidden");
-
-
-            document
-            .getElementById(
-                "detectedMedicine"
-            )
-            .innerHTML =
-
-            "<strong>" +
-            medicine.name +
-            "</strong><br><br>" +
-
-            "Obat dikenali dari hasil OCR.";
-
-
-            status.innerText =
-            "✅ " +
-            medicine.name +
-            " berhasil dikenali.";
-
-        }
-
-        else {
-
-            document
-            .getElementById(
-                "detectedCard"
-            )
-            .classList
-            .add("hidden");
-
-
-            status.innerText =
-            "⚠️ Nama obat belum dikenali.";
-
-        }
-
-    }
-
-    catch(error) {
-
-        console.error(error);
-
-        status.innerText =
-        "❌ OCR gagal.";
-
-    }
-
-}
-
-
-/* =====================================================
-   FIND MEDICINE
-===================================================== */
-
-let detectedMedicineName = "";
-
-
-function findMedicine(text) {
-
-    const cleanText =
-    text
-    .toUpperCase()
-    .replace(
-        /[^A-Z0-9]/g,
-        ""
-    );
-
-
-    for (
-        const medicine of formulary
-    ) {
-
-        for (
-            const keyword of medicine.keywords
-        ) {
-
-            const cleanKeyword =
-            keyword
-            .toUpperCase()
-            .replace(
-                /[^A-Z0-9]/g,
-                ""
-            );
-
-
-            if (
-                cleanText.includes(
-                    cleanKeyword
-                )
-            ) {
-
-                return medicine;
-
-            }
-
-        }
-
-    }
-
-
-    return null;
-
-}
-
-
-/* =====================================================
-   APPROVE
-===================================================== */
-
-document
-.getElementById("approveButton")
-.addEventListener(
-    "click",
-    approveMedicine
-);
-
-
-function approveMedicine() {
-
-    if (!detectedMedicineName) {
-
-        return;
-
-    }
-
-
-    if (
-        stock[
-            detectedMedicineName
-        ] === undefined
-    ) {
-
-        stock[
-            detectedMedicineName
-        ] = 0;
-
-    }
-
-
-    stock[
-        detectedMedicineName
-    ]++;
-
-
-    saveStock();
-
-    renderStock();
-
-
-    document
-    .getElementById(
-        "detectedCard"
-    )
-    .classList
-    .add("hidden");
-
-
-    status.innerText =
-    "✅ " +
-    detectedMedicineName +
-    " masuk ke stok.";
-
-
-    detectedMedicineName = "";
-
-}
-
-
-/* =====================================================
-   CANCEL
-===================================================== */
-
-document
-.getElementById("cancelButton")
-.addEventListener(
-    "click",
-    function() {
-
-        detectedMedicineName = "";
-
-        document
-        .getElementById(
-            "detectedCard"
-        )
-        .classList
-        .add("hidden");
-
-    }
-);
-
-
-/* =====================================================
-   RENDER STOCK
-===================================================== */
-
-function renderStock() {
-
-    const list =
-    document.getElementById(
-        "stockList"
-    );
-
-
-    const names =
-    Object.keys(stock);
-
-
-    if (names.length === 0) {
-
-        list.innerHTML =
-        "Belum ada obat.";
-
-        return;
-
-    }
-
-
-    list.innerHTML = "";
-
-
-    names.forEach(
-        function(name) {
-
-            const quantity =
-            stock[name];
-
-
-            const row =
-            document.createElement(
-                "div"
-            );
-
-
-            row.className =
-            "stock-row";
-
-
-            const warning =
-            quantity <= 2
-            ? '<div class="stock-warning">⚠️ Stok rendah</div>'
-            : "";
-
-
-            row.innerHTML =
-
-            "<div>" +
-
-            '<div class="stock-name">' +
-            escapeHTML(name) +
-            "</div>" +
-
-            warning +
-
-            "</div>" +
-
-            '<div class="stock-buttons">' +
-
-            '<button onclick="minusStock(\'' +
-            escapeJS(name) +
-            "')\">−</button>" +
-
-            '<span class="number">' +
-            quantity +
-            "</span>" +
-
-            '<button onclick="plusStock(\'' +
-            escapeJS(name) +
-            "')\">+</button>" +
-
-            "</div>";
-
-
-            list.appendChild(row);
-
-        }
-    );
-
-}
-
-
-/* =====================================================
-   PLUS
-===================================================== */
-
-function plusStock(name) {
-
-    stock[name]++;
-
-    saveStock();
-
-    renderStock();
-
-}
-
-
-/* =====================================================
-   MINUS
-===================================================== */
-
-function minusStock(name) {
-
-    if (stock[name] > 0) {
-
-        stock[name]--;
-
-    }
-
-
-    saveStock();
-
-    renderStock();
-
-}
-
-
-/* =====================================================
-   PRINT
-===================================================== */
-
-document
-.getElementById("printButton")
-.addEventListener(
-    "click",
-    printLabel
-);
-
-
-function printLabel() {
-
-    document.getElementById(
-        "labelPatient"
-    ).innerText =
-    document.getElementById(
-        "patientName"
-    ).value;
-
-
-    document.getElementById(
-        "labelMedicine"
-    ).innerText =
-    document.getElementById(
-        "printMedicine"
-    ).value;
-
-
-    document.getElementById(
-        "labelDose"
-    ).innerText =
-    document.getElementById(
-        "dose"
-    ).value;
-
-
-    document.getElementById(
-        "labelTime"
-    ).innerText =
-    new Date()
-    .toLocaleString("id-ID");
-
-
-    window.print();
-
-}
-
-
-/* =====================================================
-   SECURITY
-===================================================== */
-
-function escapeHTML(text) {
-
-    return String(text)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
-
-}
-
-
-function escapeJS(text) {
-
-    return String(text)
-    .replace(/\\/g, "\\\\")
-    .replace(/'/g, "\\'");
-
-}
-
-
-/* =====================================================
-   START
-===================================================== */
-
-renderStock();
-
-
-window.addEventListener(
-    "beforeunload",
-    function() {
-
-        if (cameraStream) {
-
-            cameraStream
-            .getTracks()
-            .forEach(
-                track => track.stop()
-            );
-
-        }
-
-    }
-);
-
-</script>
-
-</body>
-</html>
+        <label>Nama
