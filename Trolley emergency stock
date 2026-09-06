@@ -1,0 +1,1110 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Smart Nursing Trolley</title>
+
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    background: #f4f6f8;
+    color: #222;
+}
+
+header {
+    background: #263238;
+    color: white;
+    padding: 18px;
+    text-align: center;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 22px;
+}
+
+header p {
+    margin: 6px 0 0;
+    font-size: 13px;
+}
+
+.container {
+    padding: 15px;
+    max-width: 700px;
+    margin: auto;
+}
+
+.card {
+    background: white;
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+h2 {
+    font-size: 18px;
+    margin-top: 0;
+}
+
+video {
+    width: 100%;
+    border-radius: 10px;
+    background: black;
+    min-height: 220px;
+    object-fit: cover;
+}
+
+button {
+    border: none;
+    border-radius: 8px;
+    padding: 11px 14px;
+    font-size: 15px;
+    cursor: pointer;
+    margin: 4px;
+}
+
+.btn-camera {
+    background: #37474f;
+    color: white;
+}
+
+.btn-scan {
+    background: #1565c0;
+    color: white;
+}
+
+.btn-approve {
+    background: #2e7d32;
+    color: white;
+}
+
+.btn-cancel {
+    background: #757575;
+    color: white;
+}
+
+.btn-print {
+    background: #6a1b9a;
+    color: white;
+}
+
+.btn-plus {
+    background: #2e7d32;
+    color: white;
+    min-width: 42px;
+}
+
+.btn-minus {
+    background: #c62828;
+    color: white;
+    min-width: 42px;
+}
+
+.status {
+    margin-top: 10px;
+    padding: 10px;
+    background: #eceff1;
+    border-radius: 8px;
+    font-size: 14px;
+}
+
+.scan-result {
+    display: none;
+    margin-top: 15px;
+    padding: 15px;
+    border: 2px solid #2e7d32;
+    border-radius: 10px;
+    background: #e8f5e9;
+}
+
+.scan-result h3 {
+    margin-top: 0;
+    color: #1b5e20;
+}
+
+.medicine-name {
+    font-size: 22px;
+    font-weight: bold;
+    margin: 10px 0;
+}
+
+.stock-item {
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 13px;
+    margin-bottom: 10px;
+    background: white;
+}
+
+.stock-name {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.stock-number {
+    font-size: 25px;
+    font-weight: bold;
+    margin: 8px 0;
+}
+
+.low-stock {
+    color: #c62828;
+    font-weight: bold;
+}
+
+.normal-stock {
+    color: #2e7d32;
+    font-weight: bold;
+}
+
+.empty {
+    text-align: center;
+    color: #777;
+    padding: 20px;
+}
+
+canvas {
+    display: none;
+}
+
+#printArea {
+    display: none;
+}
+
+@media print {
+
+    body * {
+        visibility: hidden;
+    }
+
+    #printArea,
+    #printArea * {
+        visibility: visible;
+    }
+
+    #printArea {
+        display: block;
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+    }
+
+    .label {
+        width: 70mm;
+        height: 35mm;
+        border: 2px solid black;
+        margin: 10mm auto;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        font-size: 22px;
+        font-weight: bold;
+        page-break-after: always;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>SMART NURSING TROLLEY</h1>
+    <p>Emergency Drug Inventory System</p>
+</header>
+
+<div class="container">
+
+    <!-- CAMERA -->
+    <div class="card">
+
+        <h2>📷 Scan Obat</h2>
+
+        <video id="camera" autoplay playsinline></video>
+
+        <button class="btn-camera" onclick="startCamera()">
+            Buka Kamera
+        </button>
+
+        <button class="btn-scan" onclick="scanMedicine()">
+            🔍 Scan Obat
+        </button>
+
+        <canvas id="canvas"></canvas>
+
+        <div id="status" class="status">
+            Kamera belum digunakan.
+        </div>
+
+        <!-- HASIL SCAN -->
+        <div id="scanResult" class="scan-result">
+
+            <h3>Obat/Bahan Terdeteksi</h3>
+
+            <div id="medicineName" class="medicine-name">
+                -
+            </div>
+
+            <p>
+                Pastikan nama sudah benar sebelum di-Approve.
+            </p>
+
+            <button
+                class="btn-approve"
+                onclick="approveMedicine()">
+                ✅ Approve
+            </button>
+
+            <button
+                class="btn-cancel"
+                onclick="cancelScan()">
+                ❌ Batal
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- STOCK -->
+    <div class="card">
+
+        <h2>📦 Stok</h2>
+
+        <div id="stockList">
+
+            <div class="empty">
+                Belum ada item yang di-approve.
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- AREA PRINT -->
+<div id="printArea"></div>
+
+
+<script>
+
+/* =====================================================
+   FORMULARIUM INTERNAL
+   TERMASUK ALKOHOL 70% UNTUK TEST SEMENTARA
+===================================================== */
+
+const formulary = [
+
+    {
+        name: "Epinephrine",
+        keywords: [
+            "EPINEPHRINE",
+            "EPINEPHRIN",
+            "ADRENALINE",
+            "EPINEPHRINE HCL"
+        ]
+    },
+
+    {
+        name: "Norepinephrine",
+        keywords: [
+            "NOREPINEPHRINE",
+            "NOREPINEPHRIN",
+            "NORADRENALINE",
+            "NOREPI",
+            "NOREPI HCL"
+        ]
+    },
+
+    {
+        name: "Dopamine",
+        keywords: [
+            "DOPAMINE",
+            "DOPAMINE HCL",
+            "DOPAMIN"
+        ]
+    },
+
+    {
+        name: "Dobutamine",
+        keywords: [
+            "DOBUTAMINE",
+            "DOBUTAMINE HCL",
+            "DOBUTAMIN"
+        ]
+    },
+
+    {
+        name: "Midazolam",
+        keywords: [
+            "MIDAZOLAM",
+            "MIDAZOLAM HCL"
+        ]
+    },
+
+    {
+        name: "Fentanyl",
+        keywords: [
+            "FENTANYL",
+            "FENTANYL CITRATE",
+            "FENTANIL"
+        ]
+    },
+
+    {
+        name: "Ketamine",
+        keywords: [
+            "KETAMINE",
+            "KETAMINE HCL",
+            "KETAMIN"
+        ]
+    },
+
+    {
+        name: "Lidocaine",
+        keywords: [
+            "LIDOCAINE",
+            "LIDOCAIN",
+            "LIDOCAINE HCL",
+            "XYLOCAINE"
+        ]
+    },
+
+    {
+        name: "D40",
+        keywords: [
+            "D40",
+            "D 40",
+            "D-40",
+            "DEXTROSE 40",
+            "DEXTROSE 40%"
+        ]
+    },
+
+    {
+        name: "Meylon",
+        keywords: [
+            "MEYLON",
+            "SODIUM BICARBONATE",
+            "SODIUM BICARBONATE INJECTION"
+        ]
+    },
+
+    {
+        name: "Dexamethasone",
+        keywords: [
+            "DEXAMETHASONE",
+            "DEXAMETHASON",
+            "DEXAMETHASONE SODIUM PHOSPHATE"
+        ]
+    },
+
+    /* ================================
+       TAMBAHAN SEMENTARA
+       ALKOHOL 70%
+    ================================= */
+
+    {
+        name: "Alkohol 70%",
+        keywords: [
+            "ALKOHOL 70",
+            "ALCOHOL 70",
+            "ETHANOL 70",
+            "ALKOHOL",
+            "ALCOHOL",
+            "ETHANOL",
+            "70%"
+        ]
+    }
+
+];
+
+
+/* =====================================================
+   VARIABEL
+===================================================== */
+
+let stream = null;
+
+let detectedMedicine = null;
+
+let stock =
+    JSON.parse(
+        localStorage.getItem(
+            "smartNursingTrolleyStock"
+        )
+    ) || {};
+
+
+/* =====================================================
+   BUKA KAMERA
+===================================================== */
+
+async function startCamera() {
+
+    const video =
+        document.getElementById("camera");
+
+    const status =
+        document.getElementById("status");
+
+    try {
+
+        if (stream) {
+
+            stream
+                .getTracks()
+                .forEach(
+                    track => track.stop()
+                );
+
+        }
+
+        stream =
+            await navigator
+                .mediaDevices
+                .getUserMedia({
+
+                    video: {
+
+                        facingMode: {
+                            ideal: "environment"
+                        },
+
+                        width: {
+                            ideal: 1920
+                        },
+
+                        height: {
+                            ideal: 1080
+                        }
+
+                    },
+
+                    audio: false
+
+                });
+
+
+        video.srcObject = stream;
+
+        status.innerText =
+            "📷 Kamera aktif. Arahkan kamera ke tulisan nama obat.";
+
+    }
+
+    catch (error) {
+
+        console.error(error);
+
+        status.innerText =
+            "❌ Kamera tidak dapat dibuka. Cek izin kamera.";
+
+    }
+
+}
+
+
+/* =====================================================
+   SCAN
+===================================================== */
+
+async function scanMedicine() {
+
+    const video =
+        document.getElementById("camera");
+
+    const canvas =
+        document.getElementById("canvas");
+
+    const status =
+        document.getElementById("status");
+
+
+    if (!stream) {
+
+        status.innerText =
+            "⚠️ Buka kamera terlebih dahulu.";
+
+        return;
+
+    }
+
+
+    status.innerText =
+        "⏳ Mengambil gambar...";
+
+
+    const width =
+        video.videoWidth;
+
+    const height =
+        video.videoHeight;
+
+
+    canvas.width =
+        width;
+
+    canvas.height =
+        height;
+
+
+    const ctx =
+        canvas.getContext("2d");
+
+
+    /*
+       PENINGKATAN GAMBAR
+       Supaya tulisan lebih mudah dibaca OCR
+    */
+
+    ctx.filter =
+        "grayscale(100%) contrast(200%) brightness(110%)";
+
+
+    ctx.drawImage(
+        video,
+        0,
+        0,
+        width,
+        height
+    );
+
+
+    status.innerText =
+        "🔎 OCR sedang membaca tulisan...";
+
+
+    try {
+
+        const result =
+            await Tesseract.recognize(
+
+                canvas,
+
+                "eng",
+
+                {
+
+                    logger:
+                    function(info) {
+
+                        if (
+                            info.status ===
+                            "recognizing text"
+                        ) {
+
+                            const percent =
+                                Math.round(
+                                    info.progress * 100
+                                );
+
+                            status.innerText =
+                                "🔎 Membaca tulisan... " +
+                                percent +
+                                "%";
+
+                        }
+
+                    }
+
+                }
+
+            );
+
+
+        let text =
+            result.data.text
+                .toUpperCase()
+                .replace(/\n/g, " ")
+                .replace(/\s+/g, " ")
+                .trim();
+
+
+        console.log(
+            "HASIL OCR:",
+            text
+        );
+
+
+        const medicine =
+            findMedicine(text);
+
+
+        if (medicine) {
+
+            detectedMedicine =
+                medicine.name;
+
+
+            document.getElementById(
+                "medicineName"
+            ).innerText =
+                medicine.name;
+
+
+            document.getElementById(
+                "scanResult"
+            ).style.display =
+                "block";
+
+
+            status.innerText =
+                "✅ Obat berhasil dikenali. Silakan Approve.";
+
+        }
+
+        else {
+
+            detectedMedicine =
+                null;
+
+
+            document.getElementById(
+                "scanResult"
+            ).style.display =
+                "none";
+
+
+            status.innerText =
+                "❌ Nama belum dikenali. Coba dekatkan kamera dan pastikan tulisan jelas.";
+
+        }
+
+    }
+
+    catch (error) {
+
+        console.error(error);
+
+        status.innerText =
+            "❌ OCR gagal membaca gambar.";
+
+    }
+
+}
+
+
+/* =====================================================
+   PENCARIAN OBAT
+===================================================== */
+
+function findMedicine(text) {
+
+    /*
+       PRIORITAS KHUSUS ALKOHOL 70%
+    */
+
+    if (
+        (
+            text.includes("ALKOHOL") ||
+            text.includes("ALCOHOL") ||
+            text.includes("ETHANOL")
+        )
+        &&
+        (
+            text.includes("70") ||
+            text.includes("7O")
+        )
+    ) {
+
+        return {
+            name: "Alkohol 70%"
+        };
+
+    }
+
+
+    /*
+       OBAT LAIN
+    */
+
+    for (
+        const medicine of formulary
+    ) {
+
+        for (
+            const keyword of medicine.keywords
+        ) {
+
+            if (
+                text.includes(keyword)
+            ) {
+
+                return medicine;
+
+            }
+
+        }
+
+    }
+
+
+    return null;
+
+}
+
+
+/* =====================================================
+   APPROVE
+===================================================== */
+
+function approveMedicine() {
+
+    if (!detectedMedicine) {
+
+        alert(
+            "Belum ada obat yang terdeteksi."
+        );
+
+        return;
+
+    }
+
+
+    if (
+        !stock[detectedMedicine]
+    ) {
+
+        stock[detectedMedicine] =
+            0;
+
+    }
+
+
+    stock[detectedMedicine] += 1;
+
+
+    saveStock();
+
+    renderStock();
+
+
+    alert(
+        detectedMedicine +
+        " berhasil di-Approve dan masuk stok."
+    );
+
+
+    document.getElementById(
+        "scanResult"
+    ).style.display =
+        "none";
+
+
+    detectedMedicine =
+        null;
+
+}
+
+
+/* =====================================================
+   BATAL
+===================================================== */
+
+function cancelScan() {
+
+    detectedMedicine =
+        null;
+
+
+    document.getElementById(
+        "scanResult"
+    ).style.display =
+        "none";
+
+
+    document.getElementById(
+        "status"
+    ).innerText =
+        "Scan dibatalkan.";
+
+}
+
+
+/* =====================================================
+   SIMPAN STOK
+===================================================== */
+
+function saveStock() {
+
+    localStorage.setItem(
+
+        "smartNursingTrolleyStock",
+
+        JSON.stringify(stock)
+
+    );
+
+}
+
+
+/* =====================================================
+   TAMPILKAN STOK
+===================================================== */
+
+function renderStock() {
+
+    const stockList =
+        document.getElementById(
+            "stockList"
+        );
+
+
+    const medicines =
+        Object.keys(stock);
+
+
+    if (
+        medicines.length === 0
+    ) {
+
+        stockList.innerHTML =
+            `
+            <div class="empty">
+                Belum ada item yang di-approve.
+            </div>
+            `;
+
+        return;
+
+    }
+
+
+    stockList.innerHTML = "";
+
+
+    medicines.forEach(
+        function(name) {
+
+            const quantity =
+                stock[name];
+
+
+            let warning;
+
+
+            if (
+                quantity < 2
+            ) {
+
+                warning =
+                    `
+                    <div class="low-stock">
+                        ⚠️ Stok rendah
+                    </div>
+                    `;
+
+            }
+
+            else {
+
+                warning =
+                    `
+                    <div class="normal-stock">
+                        ✓ Stok aman
+                    </div>
+                    `;
+
+            }
+
+
+            const item =
+                document.createElement(
+                    "div"
+                );
+
+
+            item.className =
+                "stock-item";
+
+
+            item.innerHTML = `
+
+                <div class="stock-name">
+                    ${name}
+                </div>
+
+                <div class="stock-number">
+                    ${quantity}
+                </div>
+
+                ${warning}
+
+                <div>
+
+                    <button
+                        class="btn-minus"
+                        onclick="decreaseStock('${name}')">
+                        −
+                    </button>
+
+                    <button
+                        class="btn-plus"
+                        onclick="increaseStock('${name}')">
+                        +
+                    </button>
+
+                    <button
+                        class="btn-print"
+                        onclick="printLabel('${name}')">
+                        🖨️ Print Label
+                    </button>
+
+                </div>
+
+            `;
+
+
+            stockList.appendChild(
+                item
+            );
+
+        }
+    );
+
+}
+
+
+/* =====================================================
+   TAMBAH STOK
+===================================================== */
+
+function increaseStock(name) {
+
+    stock[name] =
+        (stock[name] || 0) + 1;
+
+
+    saveStock();
+
+    renderStock();
+
+}
+
+
+/* =====================================================
+   KURANG STOK
+===================================================== */
+
+function decreaseStock(name) {
+
+    if (!stock[name]) {
+
+        return;
+
+    }
+
+
+    stock[name] -= 1;
+
+
+    if (
+        stock[name] <= 0
+    ) {
+
+        delete stock[name];
+
+    }
+
+
+    saveStock();
+
+    renderStock();
+
+}
+
+
+/* =====================================================
+   PRINT LABEL
+===================================================== */
+
+function printLabel(name) {
+
+    if (
+        !stock[name]
+    ) {
+
+        alert(
+            "Obat belum masuk stok."
+        );
+
+        return;
+
+    }
+
+
+    const printArea =
+        document.getElementById(
+            "printArea"
+        );
+
+
+    printArea.innerHTML =
+        "";
+
+
+    /*
+       SATU LABEL UNTUK
+       SETIAP UNIT STOK
+    */
+
+    const quantity =
+        stock[name];
+
+
+    for (
+        let i = 0;
+        i < quantity;
+        i++
+    ) {
+
+        const label =
+            document.createElement(
+                "div"
+            );
+
+
+        label.className =
+            "label";
+
+
+        label.innerText =
+            name.toUpperCase();
+
+
+        printArea.appendChild(
+            label
+        );
+
+    }
+
+
+    window.print();
+
+}
+
+
+/* =====================================================
+   JALANKAN SAAT HALAMAN DIBUKA
+===================================================== */
+
+renderStock();
+
+</script>
+
+</body>
+</html>
