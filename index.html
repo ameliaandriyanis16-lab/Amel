@@ -1,14 +1,20 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
+
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
 
 <title>Smart Nursing Trolley System</title>
 
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 
 <style>
+
 * {
     box-sizing: border-box;
 }
@@ -140,6 +146,15 @@ video {
     border-radius: 10px;
 }
 
+.success {
+    background: #e8f5e9;
+    color: #1b5e20;
+    padding: 12px;
+    border-radius: 8px;
+    margin-top: 10px;
+    font-weight: bold;
+}
+
 .stock-row {
     display: flex;
     justify-content: space-between;
@@ -221,8 +236,11 @@ input {
         size: 58mm auto;
         margin: 0;
     }
+
 }
+
 </style>
+
 </head>
 
 <body>
@@ -254,26 +272,24 @@ input {
 
         <button
             class="btn-camera"
-            id="openCamera">
-
+            id="openCamera"
+        >
             📷 Buka Kamera Belakang
-
         </button>
 
         <button
             class="btn-stop"
-            id="stopCamera">
-
+            id="stopCamera"
+        >
             ⏹️ Matikan Kamera
-
         </button>
 
         <video
             id="camera"
             autoplay
             playsinline
-            muted>
-        </video>
+            muted
+        ></video>
 
         <div id="status">
             Kamera belum digunakan
@@ -281,10 +297,9 @@ input {
 
         <button
             class="btn-scan"
-            id="scanButton">
-
+            id="scanButton"
+        >
             🔍 Scan Obat
-
         </button>
 
     </div>
@@ -309,7 +324,8 @@ input {
 
     <div
         class="card hidden"
-        id="detectedCard">
+        id="detectedCard"
+    >
 
         <h2>
             💊 Obat Terdeteksi
@@ -317,23 +333,21 @@ input {
 
         <div
             class="detected"
-            id="detectedMedicine">
-        </div>
+            id="detectedMedicine"
+        ></div>
 
         <button
             class="btn-approve"
-            id="approveButton">
-
+            id="approveButton"
+        >
             ✅ Approve & Tambahkan ke Stok
-
         </button>
 
         <button
             class="btn-cancel"
-            id="cancelButton">
-
+            id="cancelButton"
+        >
             ❌ Batal
-
         </button>
 
     </div>
@@ -356,7 +370,10 @@ input {
 
     <!-- PRINT -->
 
-    <div class="card">
+    <div
+        class="card"
+        id="printCard"
+    >
 
         <h2>
             🖨️ Print Label
@@ -369,7 +386,8 @@ input {
         <input
             id="patientName"
             type="text"
-            placeholder="Nama pasien">
+            placeholder="Nama pasien"
+        >
 
         <label>
             Nama Obat
@@ -378,14 +396,14 @@ input {
         <input
             id="labelMedicine"
             type="text"
-            placeholder="Nama obat">
+            placeholder="Nama obat"
+        >
 
         <button
             class="btn-print"
-            id="printButton">
-
+            id="printButton"
+        >
             🖨️ Print Label 58 mm
-
         </button>
 
     </div>
@@ -428,7 +446,8 @@ input {
 <script>
 
 /* =====================================================
-   FORMULARIUM OBAT
+   FORMULARIUM INTERNAL
+   TIDAK DITAMPILKAN DI LAYAR
 ===================================================== */
 
 const formulary = {
@@ -512,9 +531,9 @@ const formulary = {
         "ALCOHOL",
         "ETHANOL",
         "70%",
-        "70",
-        "7O"
+        "70"
     ]
+
 };
 
 
@@ -539,34 +558,28 @@ let cameraStream = null;
 ===================================================== */
 
 const camera =
-    document.getElementById(
-        "camera"
-    );
+    document.getElementById("camera");
 
 const status =
-    document.getElementById(
-        "status"
-    );
+    document.getElementById("status");
 
 const ocrResult =
-    document.getElementById(
-        "ocrResult"
-    );
+    document.getElementById("ocrResult");
 
 const detectedCard =
-    document.getElementById(
-        "detectedCard"
-    );
+    document.getElementById("detectedCard");
 
 const detectedMedicine =
-    document.getElementById(
-        "detectedMedicine"
-    );
+    document.getElementById("detectedMedicine");
 
 const stockList =
-    document.getElementById(
-        "stockList"
-    );
+    document.getElementById("stockList");
+
+const printCard =
+    document.getElementById("printCard");
+
+const labelMedicine =
+    document.getElementById("labelMedicine");
 
 
 /* =====================================================
@@ -592,9 +605,7 @@ function renderStock() {
     const medicines =
         Object.keys(stock);
 
-    if (
-        medicines.length === 0
-    ) {
+    if (medicines.length === 0) {
 
         stockList.innerHTML =
             "Belum ada obat.";
@@ -604,66 +615,61 @@ function renderStock() {
 
     stockList.innerHTML = "";
 
-    medicines.forEach(
-        function(name) {
+    medicines.forEach(function(name) {
 
-            const qty =
-                stock[name];
+        const qty = stock[name];
 
-            const row =
-                document.createElement(
-                    "div"
-                );
+        const row =
+            document.createElement("div");
 
-            row.className =
-                "stock-row";
+        row.className =
+            "stock-row";
 
-            row.innerHTML = `
+        row.innerHTML = `
 
-                <div>
+            <div>
 
-                    <div class="stock-name">
-                        ${name}
-                    </div>
-
-                    ${
-                        qty <= 2
-                        ?
-                        `<div class="low">
-                            ⚠️ Stok rendah
-                        </div>`
-                        :
-                        ""
-                    }
-
+                <div class="stock-name">
+                    ${name}
                 </div>
 
-                <div class="stock-control">
+                ${
+                    qty <= 2
+                    ?
+                    `<div class="low">
+                        ⚠️ Stok rendah
+                    </div>`
+                    :
+                    ""
+                }
 
-                    <button
-                        onclick="decreaseStock('${name}')">
-                        −
-                    </button>
+            </div>
 
-                    <span class="qty">
-                        ${qty}
-                    </span>
+            <div class="stock-control">
 
-                    <button
-                        onclick="increaseStock('${name}')">
-                        +
-                    </button>
+                <button
+                    onclick="decreaseStock('${name}')"
+                >
+                    −
+                </button>
 
-                </div>
+                <span class="qty">
+                    ${qty}
+                </span>
 
-            `;
+                <button
+                    onclick="increaseStock('${name}')"
+                >
+                    +
+                </button>
 
-            stockList.appendChild(
-                row
-            );
+            </div>
 
-        }
-    );
+        `;
+
+        stockList.appendChild(row);
+
+    });
 
 }
 
@@ -690,20 +696,14 @@ function increaseStock(name) {
 
 function decreaseStock(name) {
 
-    if (
-        !stock[name]
-    ) {
+    if (!stock[name]) {
         return;
     }
 
     stock[name]--;
 
-    if (
-        stock[name] < 0
-    ) {
-
+    if (stock[name] < 0) {
         stock[name] = 0;
-
     }
 
     saveStock();
@@ -722,21 +722,14 @@ function findMedicine(text) {
     const upperText =
         text
         .toUpperCase()
-        .replace(
-            /\s+/g,
-            " "
-        );
+        .replace(/\s+/g, " ");
 
-    for (
-        const medicine in formulary
-    ) {
+    for (const medicine in formulary) {
 
         const keywords =
             formulary[medicine];
 
-        for (
-            const keyword of keywords
-        ) {
+        for (const keyword of keywords) {
 
             if (
                 upperText.includes(
@@ -758,7 +751,7 @@ function findMedicine(text) {
 
 
 /* =====================================================
-   CAMERA - BELAKANG
+   OPEN BACK CAMERA
 ===================================================== */
 
 async function openBackCamera() {
@@ -769,26 +762,22 @@ async function openBackCamera() {
             "📷 Meminta izin kamera...";
 
 
-        /* ---------------------------------------------
-           STOP STREAM LAMA
-        --------------------------------------------- */
+        /* STOP CAMERA LAMA */
 
         if (cameraStream) {
 
             cameraStream
-                .getTracks()
-                .forEach(
-                    track => track.stop()
-                );
+            .getTracks()
+            .forEach(
+                track => track.stop()
+            );
 
             cameraStream = null;
 
         }
 
 
-        /* ---------------------------------------------
-           CEK SUPPORT CAMERA
-        --------------------------------------------- */
+        /* CEK SUPPORT */
 
         if (
             !navigator.mediaDevices ||
@@ -803,108 +792,11 @@ async function openBackCamera() {
         }
 
 
-        /* ---------------------------------------------
-           LANGKAH 1
-           MINTA IZIN KAMERA
-        --------------------------------------------- */
+        /* =================================================
+           COBA KAMERA BELAKANG LANGSUNG
+        ================================================= */
 
-        let temporaryStream =
-            await navigator
-            .mediaDevices
-            .getUserMedia({
-
-                video: true,
-                audio: false
-
-            });
-
-
-        /* ---------------------------------------------
-           AMBIL DAFTAR KAMERA
-        --------------------------------------------- */
-
-        let devices =
-            await navigator
-            .mediaDevices
-            .enumerateDevices();
-
-
-        let cameras =
-            devices.filter(
-                device =>
-                device.kind ===
-                "videoinput"
-            );
-
-
-        /* ---------------------------------------------
-           CARI KAMERA BELAKANG
-        --------------------------------------------- */
-
-        let backCamera =
-            cameras.find(
-                device => {
-
-                    const label =
-                        (
-                            device.label
-                            || ""
-                        )
-                        .toLowerCase();
-
-                    return (
-
-                        label.includes(
-                            "back"
-                        )
-
-                        ||
-
-                        label.includes(
-                            "rear"
-                        )
-
-                        ||
-
-                        label.includes(
-                            "environment"
-                        )
-
-                        ||
-
-                        label.includes(
-                            "main"
-                        )
-
-                    );
-
-                }
-            );
-
-
-        /* ---------------------------------------------
-           MATIKAN STREAM SEMENTARA
-        --------------------------------------------- */
-
-        temporaryStream
-            .getTracks()
-            .forEach(
-                track => track.stop()
-            );
-
-
-        /* ---------------------------------------------
-           JIKA KAMERA BELAKANG DITEMUKAN
-        --------------------------------------------- */
-
-        if (
-            backCamera &&
-            backCamera.deviceId
-        ) {
-
-            status.innerText =
-                "📷 Mengaktifkan kamera belakang...";
-
+        try {
 
             cameraStream =
                 await navigator
@@ -913,9 +805,55 @@ async function openBackCamera() {
 
                     video: {
 
-                        deviceId: {
-                            exact:
-                            backCamera.deviceId
+                        facingMode: {
+                            exact: "environment"
+                        },
+
+                        width: {
+                            ideal: 1920
+                        },
+
+                        height: {
+                            ideal: 1080
+                        }
+
+                    },
+
+                    audio: false
+
+                });
+
+        }
+
+        catch (firstError) {
+
+            console.log(
+                "Exact environment gagal:",
+                firstError
+            );
+
+
+            /* =================================================
+               COBA IDEAL ENVIRONMENT
+            ================================================= */
+
+            cameraStream =
+                await navigator
+                .mediaDevices
+                .getUserMedia({
+
+                    video: {
+
+                        facingMode: {
+                            ideal: "environment"
+                        },
+
+                        width: {
+                            ideal: 1920
+                        },
+
+                        height: {
+                            ideal: 1080
                         }
 
                     },
@@ -927,72 +865,7 @@ async function openBackCamera() {
         }
 
 
-        /* ---------------------------------------------
-           JIKA LABEL KAMERA TIDAK TERSEDIA
-           COBA FACINGMODE
-        --------------------------------------------- */
-
-        else {
-
-            status.innerText =
-                "📷 Mencoba kamera belakang...";
-
-
-            try {
-
-                cameraStream =
-                    await navigator
-                    .mediaDevices
-                    .getUserMedia({
-
-                        video: {
-
-                            facingMode: {
-                                exact:
-                                "environment"
-                            }
-
-                        },
-
-                        audio: false
-
-                    });
-
-            }
-
-            catch (
-                environmentError
-            ) {
-
-                /*
-                 * Fallback terakhir.
-                 * Ini hanya digunakan jika
-                 * browser tidak mendukung
-                 * pemilihan environment.
-                 */
-
-                cameraStream =
-                    await navigator
-                    .mediaDevices
-                    .getUserMedia({
-
-                        video: {
-                            facingMode:
-                            "environment"
-                        },
-
-                        audio: false
-
-                    });
-
-            }
-
-        }
-
-
-        /* ---------------------------------------------
-           TAMPILKAN KAMERA
-        --------------------------------------------- */
+        /* TAMPILKAN CAMERA */
 
         camera.srcObject =
             cameraStream;
@@ -1000,23 +873,22 @@ async function openBackCamera() {
         await camera.play();
 
 
-        /* ---------------------------------------------
-           CEK CAMERA YANG AKTIF
-        --------------------------------------------- */
+        /* CEK CAMERA */
 
-        const activeTrack =
-            cameraStream
-            .getVideoTracks()[0];
+        const tracks =
+            cameraStream.getVideoTracks();
 
-        const settings =
-            activeTrack
-            .getSettings();
+        if (tracks.length > 0) {
 
+            const settings =
+                tracks[0].getSettings();
 
-        console.log(
-            "Camera settings:",
-            settings
-        );
+            console.log(
+                "Camera settings:",
+                settings
+            );
+
+        }
 
 
         status.innerText =
@@ -1050,17 +922,16 @@ function stopCamera() {
     if (cameraStream) {
 
         cameraStream
-            .getTracks()
-            .forEach(
-                track => track.stop()
-            );
+        .getTracks()
+        .forEach(
+            track => track.stop()
+        );
 
         cameraStream = null;
 
     }
 
-    camera.srcObject =
-        null;
+    camera.srcObject = null;
 
     status.innerText =
         "Kamera dimatikan";
@@ -1085,39 +956,48 @@ async function scanMedicine() {
     }
 
 
+    if (
+        !camera.videoWidth ||
+        !camera.videoHeight
+    ) {
+
+        alert(
+            "Kamera belum siap. Tunggu sebentar lalu scan lagi."
+        );
+
+        return;
+
+    }
+
+
     status.innerText =
         "⏳ Menyiapkan gambar...";
 
 
     try {
 
-        /* ---------------------------------------------
+        /* =================================================
            CANVAS
-        --------------------------------------------- */
+        ================================================= */
 
         const canvas =
-            document.createElement(
-                "canvas"
-            );
+            document.createElement("canvas");
 
 
         canvas.width =
             camera.videoWidth;
-
 
         canvas.height =
             camera.videoHeight;
 
 
         const ctx =
-            canvas.getContext(
-                "2d"
-            );
+            canvas.getContext("2d");
 
 
-        /* ---------------------------------------------
-           GAMBAR DARI CAMERA
-        --------------------------------------------- */
+        /* =================================================
+           GAMBAR CAMERA
+        ================================================= */
 
         ctx.drawImage(
 
@@ -1132,9 +1012,9 @@ async function scanMedicine() {
         );
 
 
-        /* ---------------------------------------------
+        /* =================================================
            OCR
-        --------------------------------------------- */
+        ================================================= */
 
         status.innerText =
             "🔍 Membaca nama obat...";
@@ -1159,8 +1039,7 @@ async function scanMedicine() {
 
                             const percent =
                                 Math.round(
-                                    info.progress
-                                    * 100
+                                    info.progress * 100
                                 );
 
                             status.innerText =
@@ -1177,13 +1056,12 @@ async function scanMedicine() {
             );
 
 
-        /* ---------------------------------------------
-           HASIL OCR
-        --------------------------------------------- */
+        /* =================================================
+           OCR RESULT
+        ================================================= */
 
         const text =
-            result.data.text
-            .trim();
+            result.data.text.trim();
 
 
         ocrResult.innerText =
@@ -1191,14 +1069,12 @@ async function scanMedicine() {
             "Tulisan tidak terbaca.";
 
 
-        /* ---------------------------------------------
-           CARI OBAT
-        --------------------------------------------- */
+        /* =================================================
+           FIND MEDICINE
+        ================================================= */
 
         const medicine =
-            findMedicine(
-                text
-            );
+            findMedicine(text);
 
 
         if (medicine) {
@@ -1206,6 +1082,10 @@ async function scanMedicine() {
             detectedDrug =
                 medicine;
 
+
+            /* =================================================
+               HASIL OBAT
+            ================================================= */
 
             detectedMedicine.innerHTML = `
 
@@ -1221,14 +1101,40 @@ async function scanMedicine() {
 
 
             detectedCard
-                .classList
-                .remove(
-                    "hidden"
-                );
+            .classList
+            .remove("hidden");
+
+
+            /* =================================================
+               OTOMATIS MASUK PRINT LABEL
+            ================================================= */
+
+            labelMedicine.value =
+                medicine;
 
 
             status.innerText =
-                "✅ Obat ditemukan";
+                "✅ "
+                + medicine
+                + " berhasil dikenali";
+
+
+            /* =================================================
+               SCROLL KE PRINT LABEL
+            ================================================= */
+
+            setTimeout(function() {
+
+                printCard.scrollIntoView({
+
+                    behavior: "smooth",
+
+                    block: "start"
+
+                });
+
+            }, 300);
+
 
         }
 
@@ -1239,10 +1145,8 @@ async function scanMedicine() {
 
 
             detectedCard
-                .classList
-                .add(
-                    "hidden"
-                );
+            .classList
+            .add("hidden");
 
 
             status.innerText =
@@ -1277,9 +1181,7 @@ async function scanMedicine() {
 function approveMedicine() {
 
     if (!detectedDrug) {
-
         return;
-
     }
 
 
@@ -1301,17 +1203,40 @@ function approveMedicine() {
     renderStock();
 
 
+    /* =================================================
+       KEEP MEDICINE IN PRINT LABEL
+    ================================================= */
+
+    labelMedicine.value =
+        detectedDrug;
+
+
     detectedCard
-        .classList
-        .add(
-            "hidden"
-        );
+    .classList
+    .add("hidden");
 
 
     status.innerText =
         "✅ "
         + detectedDrug
         + " ditambahkan ke stok";
+
+
+    /* =================================================
+       SCROLL PRINT LABEL
+    ================================================= */
+
+    setTimeout(function() {
+
+        printCard.scrollIntoView({
+
+            behavior: "smooth",
+
+            block: "start"
+
+        });
+
+    }, 300);
 
 
     detectedDrug =
@@ -1330,10 +1255,8 @@ function cancelMedicine() {
         null;
 
     detectedCard
-        .classList
-        .add(
-            "hidden"
-        );
+    .classList
+    .add("hidden");
 
 }
 
@@ -1353,11 +1276,7 @@ function printLabel() {
 
 
     const medicine =
-        document
-        .getElementById(
-            "labelMedicine"
-        )
-        .value;
+        labelMedicine.value;
 
 
     document
