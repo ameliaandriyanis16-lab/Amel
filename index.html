@@ -1,115 +1,1251 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
+
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Smart Trolley Nursing System</title>
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
 
-<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+<title>Smart Nursing Trolley System</title>
+
+
+<!-- =====================================================
+     TESSERACT OCR
+===================================================== -->
+
+<script
+    src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js">
+</script>
+
 
 <style>
+
+/* =====================================================
+   DASAR
+===================================================== */
+
 * {
     box-sizing: border-box;
 }
 
 body {
-    font-family: Arial, sans-serif;
+
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+
     margin: 0;
+
     background: #f4f6f8;
+
     color: #222;
+
 }
 
+
+/* =====================================================
+   HEADER
+===================================================== */
+
 header {
+
     background: #263238;
+
     color: white;
+
     padding: 18px;
+
     text-align: center;
+
 }
 
 header h1 {
+
     margin: 0;
+
     font-size: 22px;
+
 }
 
 header p {
+
     margin: 6px 0 0;
+
     font-size: 13px;
+
 }
+
+
+/* =====================================================
+   CONTAINER
+===================================================== */
 
 .container {
-    padding: 15px;
+
+    width: 100%;
+
     max-width: 700px;
+
     margin: auto;
+
+    padding: 15px;
+
 }
+
+
+/* =====================================================
+   CARD
+===================================================== */
 
 .card {
+
     background: white;
+
     border-radius: 12px;
+
     padding: 15px;
+
     margin-bottom: 15px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+
+    box-shadow:
+        0 2px 8px rgba(0,0,0,0.08);
+
 }
 
-h2 {
-    font-size: 18px;
+.card h2 {
+
     margin-top: 0;
+
+    font-size: 18px;
+
+}
+
+
+/* =====================================================
+   CAMERA
+===================================================== */
+
+.camera-wrapper {
+
+    position: relative;
+
+    width: 100%;
+
+    background: black;
+
+    border-radius: 10px;
+
+    overflow: hidden;
+
 }
 
 video {
+
     width: 100%;
+
     height: 280px;
-    border-radius: 10px;
-    background: black;
-    object-fit: cover;
+
     display: block;
+
+    object-fit: cover;
+
+    background: black;
+
 }
 
-canvas {
-    display: none;
+.camera-guide {
+
+    position: absolute;
+
+    left: 10%;
+
+    right: 10%;
+
+    top: 25%;
+
+    bottom: 25%;
+
+    border:
+        2px solid rgba(255,255,255,0.8);
+
+    border-radius: 10px;
+
+    pointer-events: none;
+
 }
+
+.camera-guide-text {
+
+    position: absolute;
+
+    bottom: 10px;
+
+    left: 0;
+
+    right: 0;
+
+    text-align: center;
+
+    color: white;
+
+    font-size: 12px;
+
+    background:
+        rgba(0,0,0,0.45);
+
+    padding: 5px;
+
+}
+
+
+/* =====================================================
+   BUTTON
+===================================================== */
 
 button {
+
     border: none;
+
     border-radius: 8px;
+
     padding: 11px 14px;
+
     font-size: 15px;
+
     cursor: pointer;
+
     margin: 4px;
+
+}
+
+button:active {
+
+    transform: scale(0.97);
+
 }
 
 .btn-camera {
+
     background: #37474f;
+
     color: white;
+
+}
+
+.btn-stop {
+
+    background: #455a64;
+
+    color: white;
+
 }
 
 .btn-scan {
+
     background: #1565c0;
+
     color: white;
+
 }
 
 .btn-approve {
+
     background: #2e7d32;
+
     color: white;
+
 }
 
 .btn-cancel {
+
     background: #757575;
+
     color: white;
+
 }
 
 .btn-print {
+
     background: #6a1b9a;
+
     color: white;
+
 }
 
 .btn-plus {
+
     background: #2e7d32;
+
     color: white;
+
     min-width: 42px;
+
 }
 
 .btn-minus {
+
     background: #c62828;
+
     color: white;
-    min-width: 
+
+    min-width: 42px;
+
+}
+
+.btn-close {
+
+    background: #757575;
+
+    color: white;
+
+}
+
+
+/* =====================================================
+   STATUS
+===================================================== */
+
+.status {
+
+    margin-top: 10px;
+
+    padding: 10px;
+
+    background: #eceff1;
+
+    border-radius: 8px;
+
+    font-size: 14px;
+
+    line-height: 1.4;
+
+}
+
+
+/* =====================================================
+   OCR RAW RESULT
+===================================================== */
+
+.ocr-box {
+
+    margin-top: 10px;
+
+    padding: 10px;
+
+    background: #fafafa;
+
+    border: 1px solid #ddd;
+
+    border-radius: 8px;
+
+    font-size: 12px;
+
+    display: none;
+
+    word-break: break-word;
+
+}
+
+
+/* =====================================================
+   SCAN RESULT
+===================================================== */
+
+.scan-result {
+
+    display: none;
+
+    margin-top: 15px;
+
+    padding: 15px;
+
+    border:
+        2px solid #2e7d32;
+
+    border-radius: 10px;
+
+    background: #e8f5e9;
+
+}
+
+.scan-result h3 {
+
+    margin-top: 0;
+
+    color: #1b5e20;
+
+}
+
+.medicine-name {
+
+    font-size: 22px;
+
+    font-weight: bold;
+
+    margin: 10px 0;
+
+}
+
+
+/* =====================================================
+   STOCK
+===================================================== */
+
+.stock-item {
+
+    border:
+        1px solid #ddd;
+
+    border-radius: 10px;
+
+    padding: 13px;
+
+    margin-bottom: 10px;
+
+    background: white;
+
+}
+
+.stock-name {
+
+    font-size: 18px;
+
+    font-weight: bold;
+
+}
+
+.stock-number {
+
+    font-size: 25px;
+
+    font-weight: bold;
+
+    margin: 8px 0;
+
+}
+
+.low-stock {
+
+    color: #c62828;
+
+    font-weight: bold;
+
+}
+
+.normal-stock {
+
+    color: #2e7d32;
+
+    font-weight: bold;
+
+}
+
+.empty {
+
+    text-align: center;
+
+    color: #777;
+
+    padding: 20px;
+
+}
+
+
+/* =====================================================
+   PRINT FORM
+===================================================== */
+
+.print-form {
+
+    display: none;
+
+    margin-top: 15px;
+
+    padding: 15px;
+
+    border:
+        2px solid #6a1b9a;
+
+    border-radius: 10px;
+
+    background: #f3e5f5;
+
+}
+
+.print-form h3 {
+
+    margin-top: 0;
+
+    color: #4a148c;
+
+}
+
+.form-group {
+
+    margin-bottom: 12px;
+
+}
+
+.form-group label {
+
+    display: block;
+
+    font-weight: bold;
+
+    margin-bottom: 5px;
+
+}
+
+.form-group input {
+
+    width: 100%;
+
+    padding: 11px;
+
+    border:
+        1px solid #bbb;
+
+    border-radius: 8px;
+
+    font-size: 15px;
+
+}
+
+.auto-medicine {
+
+    background: #eeeeee;
+
+    padding: 11px;
+
+    border-radius: 8px;
+
+    font-weight: bold;
+
+}
+
+
+/* =====================================================
+   PRINT AREA
+===================================================== */
+
+#printArea {
+
+    display: none;
+
+}
+
+
+/* =====================================================
+   PRINT 58 MM
+===================================================== */
+
+@media print {
+
+    @page {
+
+        size: 58mm auto;
+
+        margin: 0;
+
+    }
+
+    html,
+    body {
+
+        width: 58mm;
+
+        margin: 0;
+
+        padding: 0;
+
+        background: white;
+
+    }
+
+    body * {
+
+        visibility: hidden;
+
+    }
+
+    #printArea,
+    #printArea * {
+
+        visibility: visible;
+
+    }
+
+    #printArea {
+
+        display: block;
+
+        position: absolute;
+
+        left: 0;
+
+        top: 0;
+
+        width: 58mm;
+
+        margin: 0;
+
+        padding: 0;
+
+    }
+
+    .label {
+
+        width: 58mm;
+
+        min-height: 38mm;
+
+        padding:
+            4mm 3mm;
+
+        border:
+            1px solid black;
+
+        text-align: center;
+
+        font-family:
+            Arial,
+            sans-serif;
+
+        page-break-after: always;
+
+    }
+
+    .label-title {
+
+        font-size: 13px;
+
+        font-weight: bold;
+
+        margin-bottom: 4px;
+
+    }
+
+    .label-line {
+
+        border-top:
+            1px solid black;
+
+        margin: 3px 0;
+
+    }
+
+    .label-patient {
+
+        font-size: 12px;
+
+        font-weight: bold;
+
+        margin: 4px 0;
+
+    }
+
+    .label-medicine {
+
+        font-size: 15px;
+
+        font-weight: bold;
+
+        margin: 5px 0;
+
+    }
+
+    .label-dose {
+
+        font-size: 13px;
+
+        font-weight: bold;
+
+        margin: 4px 0;
+
+    }
+
+    .label-date {
+
+        font-size: 9px;
+
+        margin-top: 5px;
+
+    }
+
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<!-- =====================================================
+     HEADER
+===================================================== -->
+
+<header>
+
+    <h1>
+        SMART NURSING TROLLEY SYSTEM
+    </h1>
+
+    <p>
+        Emergency Drug Inventory System
+    </p>
+
+</header>
+
+
+<div class="container">
+
+
+<!-- =====================================================
+     CAMERA CARD
+===================================================== -->
+
+<div class="card">
+
+    <h2>
+        📷 Scan Obat
+    </h2>
+
+
+    <div class="camera-wrapper">
+
+        <video
+            id="camera"
+            autoplay
+            playsinline
+            muted>
+        </video>
+
+
+        <div class="camera-guide">
+        </div>
+
+
+        <div class="camera-guide-text">
+
+            Arahkan kamera ke tulisan
+            nama obat
+
+        </div>
+
+    </div>
+
+
+    <button
+        class="btn-camera"
+        onclick="startCamera()">
+
+        📷 Buka Kamera
+
+    </button>
+
+
+    <button
+        class="btn-stop"
+        onclick="stopCamera()">
+
+        ⏹️ Matikan Kamera
+
+    </button>
+
+
+    <button
+        class="btn-scan"
+        onclick="scanMedicine()">
+
+        🔍 Scan Obat
+
+    </button>
+
+
+    <canvas
+        id="canvas">
+    </canvas>
+
+
+    <div
+        id="status"
+        class="status">
+
+        Kamera belum digunakan.
+
+    </div>
+
+
+    <!-- =================================================
+         OCR RAW TEXT
+    ================================================= -->
+
+    <div
+        id="ocrBox"
+        class="ocr-box">
+
+        <strong>
+            Hasil pembacaan OCR:
+        </strong>
+
+        <div id="ocrText">
+        </div>
+
+    </div>
+
+
+    <!-- =================================================
+         HASIL DETEKSI
+    ================================================= -->
+
+    <div
+        id="scanResult"
+        class="scan-result">
+
+        <h3>
+            Obat/Bahan Terdeteksi
+        </h3>
+
+
+        <div
+            id="medicineName"
+            class="medicine-name">
+
+            -
+
+        </div>
+
+
+        <p>
+            Pastikan nama obat sudah benar
+            sebelum di-Approve.
+        </p>
+
+
+        <button
+            class="btn-approve"
+            onclick="approveMedicine()">
+
+            ✅ Approve
+
+        </button>
+
+
+        <button
+            class="btn-cancel"
+            onclick="cancelScan()">
+
+            ❌ Batal
+
+        </button>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     STOCK CARD
+===================================================== -->
+
+<div class="card">
+
+    <h2>
+        📦 Stok Emergency Drug
+    </h2>
+
+
+    <div id="stockList">
+
+        <div class="empty">
+
+            Belum ada item yang
+            di-Approve.
+
+        </div>
+
+    </div>
+
+</div>
+
+
+</div>
+
+
+<!-- =====================================================
+     PRINT AREA
+===================================================== -->
+
+<div id="printArea">
+</div>
+
+
+<script>
+
+
+/* =====================================================
+   FORMULARIUM INTERNAL
+=====================================================
+
+   Daftar ini TIDAK ditampilkan kepada pengguna.
+   Sistem hanya menggunakannya untuk mencocokkan
+   hasil OCR.
+===================================================== */
+
+
+const formulary = [
+
+
+    /* EPINEPHRINE */
+
+    {
+        name: "Epinephrine",
+
+        keywords: [
+
+            "EPINEPHRINE",
+
+            "EPINEPHRIN",
+
+            "EPINEPHRINE HCL",
+
+            "ADRENALINE",
+
+            "ADRENALIN"
+
+        ]
+
+    },
+
+
+    /* NOREPINEPHRINE */
+
+    {
+        name: "Norepinephrine",
+
+        keywords: [
+
+            "NOREPINEPHRINE",
+
+            "NOREPINEPHRIN",
+
+            "NOREPINEPHRINE HCL",
+
+            "NORADRENALINE",
+
+            "NORADRENALIN",
+
+            "NOREPI",
+
+            "NOREPI HCL"
+
+        ]
+
+    },
+
+
+    /* DOPAMINE */
+
+    {
+        name: "Dopamine",
+
+        keywords: [
+
+            "DOPAMINE",
+
+            "DOPAMINE HCL",
+
+            "DOPAMIN",
+
+            "DOPAMINEHYDROCHLORIDE",
+
+            "DOPAMINEHYDROCHLORID"
+
+        ]
+
+    },
+
+
+    /* DOBUTAMINE */
+
+    {
+        name: "Dobutamine",
+
+        keywords: [
+
+            "DOBUTAMINE",
+
+            "DOBUTAMINE HCL",
+
+            "DOBUTAMIN",
+
+            "DOBUTAMINEHYDROCHLORIDE"
+
+        ]
+
+    },
+
+
+    /* MIDAZOLAM */
+
+    {
+        name: "Midazolam",
+
+        keywords: [
+
+            "MIDAZOLAM",
+
+            "MIDAZOLAM HCL",
+
+            "MIDAZOLAMHYDROCHLORIDE",
+
+            "MIDAZOLAN"
+
+        ]
+
+    },
+
+
+    /* FENTANYL */
+
+    {
+        name: "Fentanyl",
+
+        keywords: [
+
+            "FENTANYL",
+
+            "FENTANYL CITRATE",
+
+            "FENTANIL",
+
+            "FENTANYL CITRAT",
+
+            "FENTANYLUM"
+
+        ]
+
+    },
+
+
+    /* KETAMINE */
+
+    {
+        name: "Ketamine",
+
+        keywords: [
+
+            "KETAMINE",
+
+            "KETAMINE HCL",
+
+            "KETAMIN",
+
+            "KETAMINEHYDROCHLORIDE"
+
+        ]
+
+    },
+
+
+    /* LIDOCAINE */
+
+    {
+        name: "Lidocaine",
+
+        keywords: [
+
+            "LIDOCAINE",
+
+            "LIDOCAIN",
+
+            "LIDOCAINE HCL",
+
+            "XYLOCAINE",
+
+            "XYLOCAIN"
+
+        ]
+
+    },
+
+
+    /* D40 */
+
+    {
+        name: "D40",
+
+        keywords: [
+
+            "D40",
+
+            "D 40",
+
+            "D-40",
+
+            "DEXTROSE 40",
+
+            "DEXTROSE 40%",
+
+            "DEXTROSE40"
+
+        ]
+
+    },
+
+
+    /* MEYLON */
+
+    {
+        name: "Meylon",
+
+        keywords: [
+
+            "MEYLON",
+
+            "MEILON",
+
+            "SODIUM BICARBONATE",
+
+            "SODIUM BICARBONAT",
+
+            "BICARBONATE"
+
+        ]
+
+    },
+
+
+    /* DEXAMETHASONE */
+
+    {
+        name: "Dexamethasone",
+
+        keywords: [
+
+            "DEXAMETHASONE",
+
+            "DEXAMETHASON",
+
+            "DEXAMETHASONE SODIUM PHOSPHATE",
+
+            "DEXAMETHASONE SODIUM",
+
+            "DEXAMETHASON SODIUM"
+
+        ]
+
+    },
+
+
+    /* ALKOHOL */
+
+    {
+        name: "Alkohol 70%",
+
+        keywords: [
+
+            "ALKOHOL 70",
+
+            "ALCOHOL 70",
+
+            "ETHANOL 70",
+
+            "ALKOHOL",
+
+            "ALCOHOL",
+
+            "ETHANOL"
+
+        ]
+
+    }
+
+];
+
+
+/* =====================================================
+   VARIABEL
+===================================================== */
+
+let stream = null;
+
+let detectedMedicine = null;
+
+let selectedPrintMedicine = null;
+
+
+/* =====================================================
+   LOAD STOCK DARI LOCAL STORAGE
+===================================================== */
+
+let stock = {};
+
+
+try {
+
+    const savedStock =
+        localStorage.getItem(
+            "smartNursingTrolleyStock"
+        );
+
+
+    if (savedStock) {
+
+        stock =
+            JSON.parse(savedStock);
+
+    }
+
+}
+
+catch (error) {
+
+    console.error(
+        "Gagal membaca stock:",
+        error
+    );
+
+    stock = {};
+
+}
+
+
+/* =====================================================
+   START CAMERA
+===================================================== */
+
+async function startCamera() {
+
+
+    const video =
+        document.getElementById(
+            "camera"
+        );
+
+
+    const status =
+        document.getElementById(
+            "status"
+        );
+
+
+    try {
+
+
+        /* CEK HTTPS */
+
+        if (
+            location.protocol !== "https:" &&
+            location.hostname !== "localhost"
+        ) {
+
+            status.innerText =
+                "❌ Kamera
