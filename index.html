@@ -67,6 +67,11 @@ button {
     cursor: pointer;
 }
 
+button:disabled {
+    opacity: .6;
+    cursor: not-allowed;
+}
+
 .btn-camera {
     background: #0b7285;
     color: white;
@@ -99,6 +104,8 @@ button {
 
 video {
     width: 100%;
+    max-height: 450px;
+    object-fit: cover;
     border-radius: 10px;
     background: black;
     margin-top: 10px;
@@ -172,6 +179,14 @@ label {
     padding: 10px;
     border-radius: 7px;
     margin-top: 10px;
+}
+
+/* AREA SCAN */
+#scanPreview {
+    width: 100%;
+    border-radius: 10px;
+    margin-top: 10px;
+    display: none;
 }
 
 /* PRINT */
@@ -248,6 +263,7 @@ label {
         </div>
 
         <button
+            id="scanButton"
             class="btn-scan"
             onclick="scanMedicine()">
             🔍 Scan Obat
@@ -255,6 +271,11 @@ label {
 
         <canvas
             id="canvas"
+            class="hidden">
+        </canvas>
+
+        <canvas
+            id="processingCanvas"
             class="hidden">
         </canvas>
 
@@ -317,7 +338,6 @@ label {
             id="patientName"
             placeholder="Nama pasien">
 
-
         <label>
             Nama Obat
         </label>
@@ -327,8 +347,6 @@ label {
             id="labelMedicine"
             placeholder="Nama obat">
 
-
-        <!-- TAMBAHAN DOSIS -->
         <label>
             Dosis / Konsentrasi
         </label>
@@ -337,7 +355,6 @@ label {
             type="text"
             id="labelDose"
             placeholder="Tulis dosis / konsentrasi">
-
 
         <button
             class="btn-print"
@@ -420,8 +437,13 @@ const formulary = {
         "DOPAMINE",
         "DOPAMIN",
         "DOPAMINE HCL",
+        "DOPAMINE HCI",
+        "DOPAMINEHCL",
+        "DOPAMINEHCI",
+        "DOPAMINE HYDROCHLORIDE",
         "DOPAMINEHYDROCHLORIDE",
-        "DOPAMINEHYDROCHLORID"
+        "DOPAMINEHYDROCHLORID",
+        "DOPAMINHCL"
     ],
 
     "Dobutamine": [
@@ -433,6 +455,10 @@ const formulary = {
         "MIDAZOLAM",
         "MIDAZOLAN",
         "MIDAZOLAM HCL",
+        "MIDAZOLAM HCI",
+        "MIDAZOLAMHCL",
+        "MIDAZOLAMHCI",
+        "MIDAZOLAM HYDROCHLORIDE",
         "MIDAZOLAMHYDROCHLORIDE"
     ],
 
@@ -441,13 +467,18 @@ const formulary = {
         "FENTANIL",
         "FENTANYL CITRATE",
         "FENTANYL CITRAT",
-        "FENTANYLUM"
+        "FENTANYLUM",
+        "FENTANYLCITRATE"
     ],
 
     "Ketamine": [
         "KETAMINE",
         "KETAMIN",
         "KETAMINE HCL",
+        "KETAMINE HCI",
+        "KETAMINEHCL",
+        "KETAMINEHCI",
+        "KETAMINE HYDROCHLORIDE",
         "KETAMINEHYDROCHLORIDE"
     ],
 
@@ -467,6 +498,7 @@ const formulary = {
     "Meylon": [
         "MEYLON",
         "SODIUM BICARBONATE",
+        "SODIUMBICARBONATE",
         "BICARBONATE"
     ],
 
@@ -477,25 +509,26 @@ const formulary = {
     ],
 
     "Alkohol 70%": [
-        "ALKOHOL",
-        "ALCOHOL",
-        "ETHANOL",
-        "70%",
-        "70",
-        "7O"
+        "ALKOHOL 70",
+        "ALCOHOL 70",
+        "ETHANOL 70",
+        "ALKOHOL70",
+        "ALCOHOL70",
+        "ETHANOL70"
     ]
 };
 
 
 /* =====================================================
-   VARIABLES
+   VARIABEL
    ===================================================== */
 
 let cameraStream = null;
 let detectedDrug = null;
+let ocrWorker = null;
+let ocrReady = false;
 
-const video =
-    document.getElementById("video");
+const video = document.getElementById("video");
 
 
 /* =====================================================
@@ -616,39 +649,49 @@ async function openBackCamera() {
         document.getElementById(
             "cameraStatus"
         ).innerText =
-            "Meminta akses kamera belakang...";
+            "⏳ Meminta akses kamera belakang...";
+
+        if (!navigator.mediaDevices ||
+            !navigator.mediaDevices.getUserMedia) {
+
+            throw new Error(
+                "Browser tidak mendukung kamera."
+            );
+
+        }
 
 
-        cameraStream =
-            await navigator.mediaDevices.getUserMedia({
-
-                video: {
-                    facingMode: {
-                        exact: "environment"
-                    }
-                },
-
-                audio: false
-
-            });
-
-
-        video.srcObject =
-            cameraStream;
-
-
-        document.getElementById(
-            "cameraStatus"
-        ).innerText =
-            "✅ Kamera belakang aktif";
-
-    }
-
-    catch (error) {
-
-        console.log(error);
+        /* COBA RESOLUSI TINGGI */
 
         try {
+
+            cameraStream =
+                await navigator.mediaDevices.getUserMedia({
+
+                    video: {
+                        facingMode: {
+                            ideal: "environment"
+                        },
+                        width: {
+                            ideal: 1920
+                        },
+                        height: {
+                            ideal: 1080
+                        },
+                        frameRate: {
+                            ideal: 30
+                        }
+                    },
+
+                    audio: false
+
+                });
+
+        }
+
+        catch (e) {
+
+            /* FALLBACK */
 
             cameraStream =
                 await navigator.mediaDevices.getUserMedia({
@@ -661,26 +704,58 @@ async function openBackCamera() {
 
                 });
 
-
-            video.srcObject =
-                cameraStream;
+        }
 
 
-            document.getElementById(
-                "cameraStatus"
-            ).innerText =
-                "✅ Kamera belakang aktif";
+        video.srcObject =
+            cameraStream;
+
+        await video.play();
+
+
+        document.getElementById(
+            "cameraStatus"
+        ).innerText =
+            "✅ Kamera belakang aktif — dekatkan tulisan obat dan pastikan fokus.";
+
+
+        /* COBA AKTIFKAN AUTOFOCUS JIKA DIDUKUNG */
+
+        const track =
+            cameraStream.getVideoTracks()[0];
+
+        if (track && track.applyConstraints) {
+
+            try {
+
+                await track.applyConstraints({
+                    advanced: [
+                        {
+                            focusMode: "continuous"
+                        }
+                    ]
+                });
+
+            }
+
+            catch (e) {
+                console.log(
+                    "Continuous focus tidak tersedia."
+                );
+            }
 
         }
 
-        catch (error2) {
+    }
 
-            document.getElementById(
-                "cameraStatus"
-            ).innerText =
-                "❌ Kamera tidak dapat dibuka. Pastikan izin kamera diberikan.";
+    catch (error) {
 
-        }
+        console.error(error);
+
+        document.getElementById(
+            "cameraStatus"
+        ).innerText =
+            "❌ Kamera tidak dapat dibuka. Izinkan akses kamera dan gunakan HTTPS/GitHub Pages.";
 
     }
 
@@ -688,7 +763,7 @@ async function openBackCamera() {
 
 
 /* =====================================================
-   MATIKAN KAMERA
+   STOP CAMERA
    ===================================================== */
 
 function stopCamera() {
@@ -709,28 +784,198 @@ function stopCamera() {
 
 
 /* =====================================================
+   NORMALISASI OCR
+   ===================================================== */
+
+function normalizeText(text) {
+
+    return text
+        .toUpperCase()
+        .replace(/\n/g, " ")
+        .replace(/\r/g, " ")
+        .replace(/[|]/g, "I")
+        .replace(/[{}[\]()]/g, " ")
+        .replace(/[^A-Z0-9% ]/g, " ")
+        .replace(/\s+/g, " ")
+        .trim();
+
+}
+
+
+/* =====================================================
+   LEVENSHTEIN DISTANCE
+   UNTUK MENANGANI TYPO OCR
+   ===================================================== */
+
+function levenshtein(a, b) {
+
+    const matrix = [];
+
+    for (let i = 0; i <= b.length; i++) {
+        matrix[i] = [i];
+    }
+
+    for (let j = 0; j <= a.length; j++) {
+        matrix[0][j] = j;
+    }
+
+    for (let i = 1; i <= b.length; i++) {
+
+        for (let j = 1; j <= a.length; j++) {
+
+            if (b.charAt(i - 1) ===
+                a.charAt(j - 1)) {
+
+                matrix[i][j] =
+                    matrix[i - 1][j - 1];
+
+            }
+
+            else {
+
+                matrix[i][j] =
+                    Math.min(
+                        matrix[i - 1][j - 1] + 1,
+                        matrix[i][j - 1] + 1,
+                        matrix[i - 1][j] + 1
+                    );
+
+            }
+
+        }
+
+    }
+
+    return matrix[b.length][a.length];
+
+}
+
+
+/* =====================================================
+   FUZZY MATCH
+   ===================================================== */
+
+function fuzzyMatch(text, keyword) {
+
+    const cleanText =
+        text.replace(/\s/g, "");
+
+    const cleanKeyword =
+        keyword
+            .toUpperCase()
+            .replace(/\s/g, "");
+
+    if (!cleanKeyword) {
+        return false;
+    }
+
+
+    /* EXACT */
+
+    if (cleanText.includes(cleanKeyword)) {
+        return true;
+    }
+
+
+    /*
+       Cek potongan kata.
+       Misalnya OCR:
+       DOPAMlNE
+       DOPAMIN
+       MIDAZ0LAM
+    */
+
+    const words =
+        text.split(" ")
+            .filter(word => word.length >= 4);
+
+
+    for (const word of words) {
+
+        const cleanWord =
+            word.replace(/\s/g, "");
+
+        if (cleanWord.length < 4) {
+            continue;
+        }
+
+        const distance =
+            levenshtein(
+                cleanWord,
+                cleanKeyword
+            );
+
+        const allowed =
+            cleanKeyword.length >= 8
+                ? 2
+                : 1;
+
+        if (distance <= allowed) {
+            return true;
+        }
+
+    }
+
+    return false;
+
+}
+
+
+/* =====================================================
    CARI OBAT
    ===================================================== */
 
 function findMedicine(text) {
 
-    const upperText =
-        text.toUpperCase();
+    const normalized =
+        normalizeText(text);
+
+
+    /* PRIORITAS OBAT YANG SERING GAGAL */
+
+    const priority =
+        [
+            "Dopamine",
+            "Midazolam",
+            "Fentanyl",
+            "Ketamine"
+        ];
+
+
+    /* CEK PRIORITAS */
+
+    for (const medicine of priority) {
+
+        for (const keyword of formulary[medicine]) {
+
+            if (fuzzyMatch(
+                normalized,
+                keyword
+            )) {
+
+                return medicine;
+
+            }
+
+        }
+
+    }
+
+
+    /* CEK SEMUA OBAT */
 
     for (
         const medicine in formulary
     ) {
 
-        const keywords =
-            formulary[medicine];
-
         for (
-            const keyword of keywords
+            const keyword of formulary[medicine]
         ) {
 
             if (
-                upperText.includes(
-                    keyword.toUpperCase()
+                fuzzyMatch(
+                    normalized,
+                    keyword
                 )
             ) {
 
@@ -743,6 +988,296 @@ function findMedicine(text) {
     }
 
     return null;
+
+}
+
+
+/* =====================================================
+   PREPROCESS IMAGE
+   ===================================================== */
+
+function preprocessImage(sourceCanvas) {
+
+    const canvas =
+        document.getElementById(
+            "processingCanvas"
+        );
+
+    const ctx =
+        canvas.getContext("2d");
+
+
+    const maxWidth = 1600;
+
+    let width =
+        sourceCanvas.width;
+
+    let height =
+        sourceCanvas.height;
+
+
+    /* UPSCALE */
+
+    if (width < maxWidth) {
+
+        const ratio =
+            maxWidth / width;
+
+        width =
+            maxWidth;
+
+        height =
+            Math.round(
+                height * ratio
+            );
+
+    }
+
+
+    canvas.width =
+        width;
+
+    canvas.height =
+        height;
+
+
+    ctx.drawImage(
+        sourceCanvas,
+        0,
+        0,
+        width,
+        height
+    );
+
+
+    const imageData =
+        ctx.getImageData(
+            0,
+            0,
+            width,
+            height
+        );
+
+
+    const data =
+        imageData.data;
+
+
+    /*
+       GRAYSCALE + CONTRAST
+    */
+
+    for (
+        let i = 0;
+        i < data.length;
+        i += 4
+    ) {
+
+        const r = data[i];
+        const g = data[i + 1];
+        const b = data[i + 2];
+
+
+        let gray =
+            (0.299 * r) +
+            (0.587 * g) +
+            (0.114 * b);
+
+
+        /*
+           CONTRAST
+        */
+
+        gray =
+            ((gray - 128) * 1.55) + 128;
+
+
+        gray =
+            Math.max(
+                0,
+                Math.min(
+                    255,
+                    gray
+                )
+            );
+
+
+        data[i] =
+            gray;
+
+        data[i + 1] =
+            gray;
+
+        data[i + 2] =
+            gray;
+
+    }
+
+
+    ctx.putImageData(
+        imageData,
+        0,
+        0
+    );
+
+
+    return canvas;
+
+}
+
+
+/* =====================================================
+   THRESHOLD IMAGE
+   ===================================================== */
+
+function createThresholdImage(sourceCanvas) {
+
+    const canvas =
+        document.createElement("canvas");
+
+    const ctx =
+        canvas.getContext("2d");
+
+
+    canvas.width =
+        sourceCanvas.width;
+
+    canvas.height =
+        sourceCanvas.height;
+
+
+    ctx.drawImage(
+        sourceCanvas,
+        0,
+        0
+    );
+
+
+    const imageData =
+        ctx.getImageData(
+            0,
+            0,
+            canvas.width,
+            canvas.height
+        );
+
+
+    const data =
+        imageData.data;
+
+
+    for (
+        let i = 0;
+        i < data.length;
+        i += 4
+    ) {
+
+        const gray =
+            data[i];
+
+
+        /*
+           THRESHOLD
+        */
+
+        const value =
+            gray > 155
+                ? 255
+                : 0;
+
+
+        data[i] =
+            value;
+
+        data[i + 1] =
+            value;
+
+        data[i + 2] =
+            value;
+
+    }
+
+
+    ctx.putImageData(
+        imageData,
+        0,
+        0
+    );
+
+
+    return canvas;
+
+}
+
+
+/* =====================================================
+   OCR WORKER
+   ===================================================== */
+
+async function prepareOCR() {
+
+    if (ocrReady) {
+        return;
+    }
+
+
+    document.getElementById(
+        "cameraStatus"
+    ).innerText =
+        "⏳ Menyiapkan mesin pembaca tulisan...";
+
+
+    ocrWorker =
+        await Tesseract.createWorker(
+            "eng",
+            1,
+            {
+                logger: info => {
+
+                    console.log(info);
+
+                }
+            }
+        );
+
+
+    await ocrWorker.setParameters({
+
+        tessedit_pageseg_mode:
+            Tesseract.PSM.SINGLE_BLOCK,
+
+        preserve_interword_spaces:
+            "1",
+
+        user_defined_dpi:
+            "300"
+
+    });
+
+
+    ocrReady = true;
+
+
+    document.getElementById(
+        "cameraStatus"
+    ).innerText =
+        "✅ Mesin OCR siap.";
+
+}
+
+
+/* =====================================================
+   OCR SATU GAMBAR
+   ===================================================== */
+
+async function recognizeImage(image) {
+
+    const result =
+        await ocrWorker.recognize(
+            image
+        );
+
+    return result.data.text || "";
 
 }
 
@@ -764,33 +1299,38 @@ async function scanMedicine() {
     }
 
 
-    const canvas =
-        document.getElementById("canvas");
+    if (
+        !video.videoWidth ||
+        !video.videoHeight
+    ) {
 
-    const ctx =
-        canvas.getContext("2d");
+        alert(
+            "Kamera belum siap. Tunggu beberapa detik lalu coba lagi."
+        );
+
+        return;
+
+    }
 
 
-    canvas.width =
-        video.videoWidth;
+    const scanButton =
+        document.getElementById(
+            "scanButton"
+        );
 
-    canvas.height =
-        video.videoHeight;
+
+    scanButton.disabled =
+        true;
 
 
-    ctx.drawImage(
-        video,
-        0,
-        0,
-        canvas.width,
-        canvas.height
-    );
+    detectedDrug =
+        null;
 
 
     document.getElementById(
         "detectedMedicine"
     ).innerHTML =
-        "⏳ Sedang membaca tulisan obat...";
+        "⏳ Mengambil gambar kamera...";
 
 
     document.getElementById(
@@ -811,47 +1351,155 @@ async function scanMedicine() {
 
     try {
 
-        const result =
-            await Tesseract.recognize(
-                canvas,
-                "eng",
-                {
+        /* =================================================
+           AMBIL FRAME KAMERA
+           ================================================= */
 
-                    logger: info => {
+        const canvas =
+            document.getElementById(
+                "canvas"
+            );
 
-                        if (
-                            info.status ===
-                            "recognizing text"
-                        ) {
+        const ctx =
+            canvas.getContext("2d");
 
-                            document.getElementById(
-                                "detectedMedicine"
-                            ).innerHTML =
-                                `⏳ Membaca... ${Math.round(
-                                    info.progress * 100
-                                )}%`;
 
-                        }
+        canvas.width =
+            video.videoWidth;
 
-                    }
+        canvas.height =
+            video.videoHeight;
 
-                }
+
+        ctx.drawImage(
+            video,
+            0,
+            0,
+            canvas.width,
+            canvas.height
+        );
+
+
+        /* =================================================
+           SIAPKAN OCR
+           ================================================= */
+
+        await prepareOCR();
+
+
+        document.getElementById(
+            "detectedMedicine"
+        ).innerHTML =
+            "⏳ Memproses gambar dan mempertajam tulisan...";
+
+
+        /* =================================================
+           PREPROCESS
+           ================================================= */
+
+        const processed =
+            preprocessImage(
+                canvas
             );
 
 
-        const text =
-            result.data.text;
+        /* =================================================
+           THRESHOLD
+           ================================================= */
+
+        const threshold =
+            createThresholdImage(
+                processed
+            );
+
+
+        /* =================================================
+           OCR MODE 1
+           ================================================= */
+
+        document.getElementById(
+            "detectedMedicine"
+        ).innerHTML =
+            "⏳ Membaca tulisan obat... 1/2";
+
+
+        await ocrWorker.setParameters({
+
+            tessedit_pageseg_mode:
+                Tesseract.PSM.SINGLE_BLOCK
+
+        });
+
+
+        const text1 =
+            await recognizeImage(
+                processed
+            );
+
+
+        let medicine =
+            findMedicine(
+                text1
+            );
+
+
+        /* =================================================
+           OCR MODE 2 JIKA BELUM KETEMU
+           ================================================= */
+
+        let text2 = "";
+
+
+        if (!medicine) {
+
+            document.getElementById(
+                "detectedMedicine"
+            ).innerHTML =
+                "⏳ Mencoba pembacaan kedua... 2/2";
+
+
+            await ocrWorker.setParameters({
+
+                tessedit_pageseg_mode:
+                    Tesseract.PSM.SPARSE_TEXT
+
+            });
+
+
+            text2 =
+                await recognizeImage(
+                    threshold
+                );
+
+
+            medicine =
+                findMedicine(
+                    text1 + " " + text2
+                );
+
+        }
+
+
+        const combinedText =
+            (
+                text1 +
+                "\n" +
+                text2
+            ).trim();
 
 
         document.getElementById(
             "ocrText"
         ).innerText =
-            "Hasil OCR:\n" + text;
+            combinedText
+                ? "Hasil OCR:\n" +
+                  combinedText
+                : "OCR tidak menemukan tulisan.";
 
 
-        const medicine =
-            findMedicine(text);
-
+        /* =================================================
+           JIKA OBAT DITEMUKAN
+           ================================================= */
 
         if (medicine) {
 
@@ -863,18 +1511,24 @@ async function scanMedicine() {
                 "detectedMedicine"
             ).innerHTML = `
 
-                <strong>
+                <strong style="font-size:20px;">
                     💊 ${medicine}
                 </strong>
 
                 <br><br>
 
-                Obat berhasil dikenali.
+                ✅ Obat berhasil dikenali.
+
+                <br><br>
+
+                Silakan tekan
+                <strong>Approve</strong>
+                untuk memasukkan 1 unit ke stok.
 
             `;
 
 
-            /* OTOMATIS MASUK KE PRINT LABEL */
+            /* OTOMATIS MASUK LABEL */
 
             document.getElementById(
                 "labelMedicine"
@@ -892,41 +1546,52 @@ async function scanMedicine() {
             ).classList.remove("hidden");
 
 
-            document
-                .querySelector(
-                    ".card:last-child"
-                );
-
-
-            setTimeout(() => {
-
-                document.getElementById(
-                    "labelMedicine"
-                ).scrollIntoView({
-                    behavior: "smooth",
-                    block: "center"
-                });
-
-            }, 300);
-
+            document.getElementById(
+                "scanResultCard"
+            ).scrollIntoView({
+                behavior: "smooth",
+                block: "center"
+            });
 
         }
 
+
+        /* =================================================
+           JIKA TIDAK DITEMUKAN
+           ================================================= */
+
         else {
 
-            detectedDrug = null;
+            detectedDrug =
+                null;
 
 
             document.getElementById(
                 "detectedMedicine"
             ).innerHTML = `
 
-                ❌ Obat tidak dikenali.
+                ❌ <strong>Obat belum dikenali.</strong>
 
                 <br><br>
 
-                Coba dekatkan kamera
-                ke tulisan nama obat.
+                Pastikan:
+
+                <br>
+                • Tulisan nama obat terlihat jelas
+                <br>
+                • Kamera fokus
+                <br>
+                • Jarak sekitar 15–30 cm
+                <br>
+                • Cahaya cukup
+                <br>
+                • Nama obat berada di tengah kamera
+
+                <br><br>
+
+                🔄 Silakan tekan
+                <strong>Scan Obat</strong>
+                lagi.
 
             `;
 
@@ -938,10 +1603,24 @@ async function scanMedicine() {
 
         console.error(error);
 
+
         document.getElementById(
             "detectedMedicine"
         ).innerHTML =
-            "❌ OCR gagal. Silakan coba scan lagi.";
+            "❌ Terjadi kesalahan saat membaca obat. Coba scan ulang.";
+
+
+        document.getElementById(
+            "ocrText"
+        ).innerText =
+            error.message || "";
+
+    }
+
+    finally {
+
+        scanButton.disabled =
+            false;
 
     }
 
@@ -955,6 +1634,10 @@ async function scanMedicine() {
 function approveMedicine() {
 
     if (!detectedDrug) {
+
+        alert(
+            "Belum ada obat yang dikenali."
+        );
 
         return;
 
@@ -977,7 +1660,16 @@ function approveMedicine() {
         ${detectedDrug}
         </strong>
 
-        berhasil ditambahkan ke stok.
+        <br><br>
+
+        Berhasil ditambahkan ke stok.
+
+        <br>
+
+        Jumlah stok sekarang:
+        <strong>
+        ${stock[detectedDrug]}
+        </strong>
 
     `;
 
@@ -991,6 +1683,20 @@ function approveMedicine() {
         "cancelBtn"
     ).classList.add("hidden");
 
+
+    detectedDrug =
+        null;
+
+
+    /* TAMPILKAN STOK TERBARU */
+
+    document.getElementById(
+        "stockList"
+    ).scrollIntoView({
+        behavior: "smooth",
+        block: "center"
+    });
+
 }
 
 
@@ -1000,7 +1706,8 @@ function approveMedicine() {
 
 function cancelScan() {
 
-    detectedDrug = null;
+    detectedDrug =
+        null;
 
 
     document.getElementById(
@@ -1038,8 +1745,6 @@ function printLabel() {
             "labelMedicine"
         ).value;
 
-
-    /* DOSIS DIISI MANUAL */
 
     const dose =
         document.getElementById(
@@ -1083,12 +1788,38 @@ function printLabel() {
     document.getElementById(
         "printTime"
     ).innerText =
-        now.toLocaleString("id-ID");
+        now.toLocaleString(
+            "id-ID"
+        );
 
 
     window.print();
 
 }
+
+
+/* =====================================================
+   BERSIHKAN WORKER SAAT HALAMAN DITUTUP
+   ===================================================== */
+
+window.addEventListener(
+    "beforeunload",
+    async () => {
+
+        if (ocrWorker) {
+
+            try {
+
+                await ocrWorker.terminate();
+
+            }
+
+            catch (e) {}
+
+        }
+
+    }
+);
 
 </script>
 
