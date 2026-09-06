@@ -179,7 +179,7 @@ button {
 }
 
 /* =========================
-   FORM PRINT LABEL
+   FORM PRINT
 ========================= */
 
 .print-form {
@@ -221,15 +221,32 @@ button {
     font-weight: bold;
 }
 
-canvas {
-    display: none;
-}
+/* =========================
+   PRINT AREA
+========================= */
 
 #printArea {
     display: none;
 }
 
+/*
+   FORMAT THERMAL PRINTER 58 MM
+*/
+
 @media print {
+
+    @page {
+        size: 58mm auto;
+        margin: 0;
+    }
+
+    html,
+    body {
+        width: 58mm;
+        margin: 0;
+        padding: 0;
+        background: white;
+    }
 
     body * {
         visibility: hidden;
@@ -245,44 +262,58 @@ canvas {
         position: absolute;
         left: 0;
         top: 0;
-        width: 100%;
+        width: 58mm;
+        margin: 0;
+        padding: 0;
     }
 
     .label {
-        width: 70mm;
-        min-height: 40mm;
-        border: 2px solid black;
-        margin: 10mm auto;
-        padding: 5mm;
+        width: 58mm;
+        min-height: 38mm;
+
+        padding: 4mm 3mm;
+
+        border: 1px solid black;
+
         text-align: center;
-        font-size: 15px;
-        font-weight: bold;
+
+        font-family: Arial, sans-serif;
+
         page-break-after: always;
     }
 
     .label-title {
-        font-size: 18px;
-        margin-bottom: 5px;
+        font-size: 13px;
+        font-weight: bold;
+        margin-bottom: 4px;
+    }
+
+    .label-line {
+        border-top: 1px solid black;
+        margin: 3px 0;
     }
 
     .label-patient {
-        font-size: 16px;
-        margin: 5px 0;
+        font-size: 12px;
+        font-weight: bold;
+        margin: 4px 0;
     }
 
     .label-medicine {
-        font-size: 18px;
+        font-size: 15px;
+        font-weight: bold;
         margin: 5px 0;
     }
 
     .label-dose {
-        font-size: 16px;
-        margin: 5px 0;
+        font-size: 13px;
+        font-weight: bold;
+        margin: 4px 0;
     }
 
     .label-date {
-        font-size: 11px;
-        margin-top: 8px;
+        font-size: 9px;
+        margin-top: 5px;
     }
 }
 </style>
@@ -298,6 +329,7 @@ canvas {
 <div class="container">
 
     <!-- CAMERA -->
+
     <div class="card">
 
         <h2>📷 Scan Obat</h2>
@@ -319,6 +351,7 @@ canvas {
         </div>
 
         <!-- HASIL SCAN -->
+
         <div id="scanResult" class="scan-result">
 
             <h3>Obat/Bahan Terdeteksi</h3>
@@ -349,6 +382,7 @@ canvas {
 
 
     <!-- STOCK -->
+
     <div class="card">
 
         <h2>📦 Stok</h2>
@@ -367,6 +401,7 @@ canvas {
 
 
 <!-- AREA PRINT -->
+
 <div id="printArea"></div>
 
 
@@ -509,10 +544,9 @@ let detectedMedicine = null;
 let selectedPrintMedicine = null;
 
 
-/*
-   STOK DISIMPAN DI LOCAL STORAGE
-   Jadi tidak hilang ketika website ditutup.
-*/
+/* =====================================================
+   LOAD STOCK
+===================================================== */
 
 let stock =
     JSON.parse(
@@ -523,7 +557,7 @@ let stock =
 
 
 /* =====================================================
-   BUKA KAMERA
+   CAMERA
 ===================================================== */
 
 async function startCamera() {
@@ -592,7 +626,7 @@ async function startCamera() {
 
 
 /* =====================================================
-   SCAN
+   SCAN OBAT
 ===================================================== */
 
 async function scanMedicine() {
@@ -767,7 +801,7 @@ async function scanMedicine() {
 
 
 /* =====================================================
-   PENCARIAN OBAT
+   FIND MEDICINE
 ===================================================== */
 
 function findMedicine(text) {
@@ -896,7 +930,7 @@ function cancelScan() {
 
 
 /* =====================================================
-   SIMPAN STOK
+   SAVE STOCK
 ===================================================== */
 
 function saveStock() {
@@ -913,7 +947,7 @@ function saveStock() {
 
 
 /* =====================================================
-   TAMPILKAN STOK
+   RENDER STOCK
 ===================================================== */
 
 function renderStock() {
@@ -1089,7 +1123,7 @@ function decreaseStock(name) {
 
 
 /* =====================================================
-   BUKA FORM PRINT
+   FORM PRINT
 ===================================================== */
 
 function openPrintForm(name) {
@@ -1108,10 +1142,6 @@ function openPrintForm(name) {
     selectedPrintMedicine =
         name;
 
-
-    /*
-       Buat form print secara dinamis
-    */
 
     const stockList =
         document.getElementById(
@@ -1195,7 +1225,7 @@ function openPrintForm(name) {
         <button
             class="btn-print"
             onclick="printPatientLabel()">
-            🖨️ Print Label
+            🖨️ Print Label 58 mm
         </button>
 
         <button
@@ -1206,10 +1236,6 @@ function openPrintForm(name) {
 
     `;
 
-
-    /*
-       Form ditaruh setelah stockList
-    */
 
     stockList.parentNode.appendChild(
         form
@@ -1228,7 +1254,7 @@ function openPrintForm(name) {
 
 
 /* =====================================================
-   TUTUP FORM
+   TUTUP FORM PRINT
 ===================================================== */
 
 function closePrintForm() {
@@ -1253,7 +1279,7 @@ function closePrintForm() {
 
 
 /* =====================================================
-   PRINT LABEL PASIEN
+   PRINT LABEL
 ===================================================== */
 
 function printPatientLabel() {
@@ -1313,10 +1339,6 @@ function printPatientLabel() {
         "";
 
 
-    /*
-       Tanggal dan waktu otomatis
-    */
-
     const now =
         new Date();
 
@@ -1353,8 +1375,10 @@ function printPatientLabel() {
             SMART NURSING TROLLEY
         </div>
 
+        <div class="label-line"></div>
+
         <div class="label-patient">
-            Pasien: ${escapeHtml(patientName)}
+            PASIEN: ${escapeHtml(patientName)}
         </div>
 
         <div class="label-medicine">
@@ -1362,8 +1386,10 @@ function printPatientLabel() {
         </div>
 
         <div class="label-dose">
-            Dosis: ${escapeHtml(dose)}
+            DOSIS: ${escapeHtml(dose)}
         </div>
+
+        <div class="label-line"></div>
 
         <div class="label-date">
             ${date} ${time}
@@ -1377,17 +1403,13 @@ function printPatientLabel() {
     );
 
 
-    /*
-       Buka jendela print HP/browser
-    */
-
     window.print();
 
 }
 
 
 /* =====================================================
-   KEAMANAN TEKS INPUT
+   ESCAPE HTML
 ===================================================== */
 
 function escapeHtml(text) {
@@ -1403,12 +1425,4 @@ function escapeHtml(text) {
 
 
 /* =====================================================
-   JALANKAN SAAT WEBSITE DIBUKA
-===================================================== */
-
-renderStock();
-
-</script>
-
-</body>
-</html>
+   LOAD DATA
