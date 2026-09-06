@@ -110,6 +110,11 @@ button {
     min-width: 42px;
 }
 
+.btn-close {
+    background: #757575;
+    color: white;
+}
+
 .status {
     margin-top: 10px;
     padding: 10px;
@@ -173,6 +178,49 @@ button {
     padding: 20px;
 }
 
+/* =========================
+   FORM PRINT LABEL
+========================= */
+
+.print-form {
+    display: none;
+    margin-top: 15px;
+    padding: 15px;
+    border: 2px solid #6a1b9a;
+    border-radius: 10px;
+    background: #f3e5f5;
+}
+
+.print-form h3 {
+    margin-top: 0;
+    color: #4a148c;
+}
+
+.form-group {
+    margin-bottom: 12px;
+}
+
+.form-group label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 11px;
+    border: 1px solid #bbb;
+    border-radius: 8px;
+    font-size: 15px;
+}
+
+.auto-medicine {
+    background: #eeeeee;
+    padding: 11px;
+    border-radius: 8px;
+    font-weight: bold;
+}
+
 canvas {
     display: none;
 }
@@ -202,16 +250,39 @@ canvas {
 
     .label {
         width: 70mm;
-        height: 35mm;
+        min-height: 40mm;
         border: 2px solid black;
         margin: 10mm auto;
-        display: flex;
-        justify-content: center;
-        align-items: center;
+        padding: 5mm;
         text-align: center;
-        font-size: 22px;
+        font-size: 15px;
         font-weight: bold;
         page-break-after: always;
+    }
+
+    .label-title {
+        font-size: 18px;
+        margin-bottom: 5px;
+    }
+
+    .label-patient {
+        font-size: 16px;
+        margin: 5px 0;
+    }
+
+    .label-medicine {
+        font-size: 18px;
+        margin: 5px 0;
+    }
+
+    .label-dose {
+        font-size: 16px;
+        margin: 5px 0;
+    }
+
+    .label-date {
+        font-size: 11px;
+        margin-top: 8px;
     }
 }
 </style>
@@ -303,7 +374,6 @@ canvas {
 
 /* =====================================================
    FORMULARIUM INTERNAL
-   TERMASUK ALKOHOL 70% UNTUK TEST SEMENTARA
 ===================================================== */
 
 const formulary = [
@@ -412,11 +482,6 @@ const formulary = [
         ]
     },
 
-    /* ================================
-       TAMBAHAN SEMENTARA
-       ALKOHOL 70%
-    ================================= */
-
     {
         name: "Alkohol 70%",
         keywords: [
@@ -440,6 +505,14 @@ const formulary = [
 let stream = null;
 
 let detectedMedicine = null;
+
+let selectedPrintMedicine = null;
+
+
+/*
+   STOK DISIMPAN DI LOCAL STORAGE
+   Jadi tidak hilang ketika website ditutup.
+*/
 
 let stock =
     JSON.parse(
@@ -565,11 +638,6 @@ async function scanMedicine() {
     const ctx =
         canvas.getContext("2d");
 
-
-    /*
-       PENINGKATAN GAMBAR
-       Supaya tulisan lebih mudah dibaca OCR
-    */
 
     ctx.filter =
         "grayscale(100%) contrast(200%) brightness(110%)";
@@ -704,10 +772,6 @@ async function scanMedicine() {
 
 function findMedicine(text) {
 
-    /*
-       PRIORITAS KHUSUS ALKOHOL 70%
-    */
-
     if (
         (
             text.includes("ALKOHOL") ||
@@ -727,10 +791,6 @@ function findMedicine(text) {
 
     }
 
-
-    /*
-       OBAT LAIN
-    */
 
     for (
         const medicine of formulary
@@ -960,7 +1020,7 @@ function renderStock() {
 
                     <button
                         class="btn-print"
-                        onclick="printLabel('${name}')">
+                        onclick="openPrintForm('${name}')">
                         🖨️ Print Label
                     </button>
 
@@ -1029,17 +1089,213 @@ function decreaseStock(name) {
 
 
 /* =====================================================
-   PRINT LABEL
+   BUKA FORM PRINT
 ===================================================== */
 
-function printLabel(name) {
+function openPrintForm(name) {
 
-    if (
-        !stock[name]
-    ) {
+    if (!stock[name]) {
 
         alert(
             "Obat belum masuk stok."
+        );
+
+        return;
+
+    }
+
+
+    selectedPrintMedicine =
+        name;
+
+
+    /*
+       Buat form print secara dinamis
+    */
+
+    const stockList =
+        document.getElementById(
+            "stockList"
+        );
+
+
+    const existingForm =
+        document.getElementById(
+            "printForm"
+        );
+
+
+    if (existingForm) {
+
+        existingForm.remove();
+
+    }
+
+
+    const form =
+        document.createElement(
+            "div"
+        );
+
+
+    form.id =
+        "printForm";
+
+    form.className =
+        "print-form";
+
+
+    form.innerHTML = `
+
+        <h3>🏷️ Data Label Obat</h3>
+
+        <div class="form-group">
+
+            <label>
+                Nama Pasien
+            </label>
+
+            <input
+                type="text"
+                id="patientName"
+                placeholder="Ketik nama pasien"
+            >
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>
+                Nama Obat
+            </label>
+
+            <div class="auto-medicine">
+                ${name}
+            </div>
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>
+                Dosis
+            </label>
+
+            <input
+                type="text"
+                id="dose"
+                placeholder="Contoh: 5 mg / 10 mcg"
+            >
+
+        </div>
+
+
+        <button
+            class="btn-print"
+            onclick="printPatientLabel()">
+            🖨️ Print Label
+        </button>
+
+        <button
+            class="btn-close"
+            onclick="closePrintForm()">
+            Tutup
+        </button>
+
+    `;
+
+
+    /*
+       Form ditaruh setelah stockList
+    */
+
+    stockList.parentNode.appendChild(
+        form
+    );
+
+
+    form.style.display =
+        "block";
+
+
+    form.scrollIntoView({
+        behavior: "smooth"
+    });
+
+}
+
+
+/* =====================================================
+   TUTUP FORM
+===================================================== */
+
+function closePrintForm() {
+
+    const form =
+        document.getElementById(
+            "printForm"
+        );
+
+
+    if (form) {
+
+        form.remove();
+
+    }
+
+
+    selectedPrintMedicine =
+        null;
+
+}
+
+
+/* =====================================================
+   PRINT LABEL PASIEN
+===================================================== */
+
+function printPatientLabel() {
+
+    const patientName =
+        document.getElementById(
+            "patientName"
+        ).value.trim();
+
+
+    const dose =
+        document.getElementById(
+            "dose"
+        ).value.trim();
+
+
+    if (!patientName) {
+
+        alert(
+            "Nama pasien harus diisi."
+        );
+
+        return;
+
+    }
+
+
+    if (!dose) {
+
+        alert(
+            "Dosis harus diisi."
+        );
+
+        return;
+
+    }
+
+
+    if (!selectedPrintMedicine) {
+
+        alert(
+            "Obat belum dipilih."
         );
 
         return;
@@ -1058,40 +1314,72 @@ function printLabel(name) {
 
 
     /*
-       SATU LABEL UNTUK
-       SETIAP UNIT STOK
+       Tanggal dan waktu otomatis
     */
 
-    const quantity =
-        stock[name];
+    const now =
+        new Date();
 
 
-    for (
-        let i = 0;
-        i < quantity;
-        i++
-    ) {
-
-        const label =
-            document.createElement(
-                "div"
-            );
-
-
-        label.className =
-            "label";
-
-
-        label.innerText =
-            name.toUpperCase();
-
-
-        printArea.appendChild(
-            label
+    const date =
+        now.toLocaleDateString(
+            "id-ID"
         );
 
-    }
 
+    const time =
+        now.toLocaleTimeString(
+            "id-ID",
+            {
+                hour: "2-digit",
+                minute: "2-digit"
+            }
+        );
+
+
+    const label =
+        document.createElement(
+            "div"
+        );
+
+
+    label.className =
+        "label";
+
+
+    label.innerHTML = `
+
+        <div class="label-title">
+            SMART NURSING TROLLEY
+        </div>
+
+        <div class="label-patient">
+            Pasien: ${escapeHtml(patientName)}
+        </div>
+
+        <div class="label-medicine">
+            ${escapeHtml(selectedPrintMedicine)}
+        </div>
+
+        <div class="label-dose">
+            Dosis: ${escapeHtml(dose)}
+        </div>
+
+        <div class="label-date">
+            ${date} ${time}
+        </div>
+
+    `;
+
+
+    printArea.appendChild(
+        label
+    );
+
+
+    /*
+       Buka jendela print HP/browser
+    */
 
     window.print();
 
@@ -1099,7 +1387,23 @@ function printLabel(name) {
 
 
 /* =====================================================
-   JALANKAN SAAT HALAMAN DIBUKA
+   KEAMANAN TEKS INPUT
+===================================================== */
+
+function escapeHtml(text) {
+
+    return text
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+
+}
+
+
+/* =====================================================
+   JALANKAN SAAT WEBSITE DIBUKA
 ===================================================== */
 
 renderStock();
