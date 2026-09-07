@@ -9,9 +9,7 @@
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 
 <style>
-*{
-    box-sizing:border-box;
-}
+*{box-sizing:border-box}
 
 body{
     margin:0;
@@ -128,11 +126,6 @@ button{
     color:#666;
 }
 
-.loading{
-    font-weight:bold;
-    color:#1976d2;
-}
-
 .stock-row{
     display:flex;
     justify-content:space-between;
@@ -203,8 +196,7 @@ button{
     margin-bottom:8px;
 }
 
-select,
-input{
+select,input{
     width:100%;
     padding:11px;
     border:1px solid #ccc;
@@ -220,7 +212,7 @@ input{
 
 .history-item{
     border-bottom:1px solid #eee;
-    padding:12px 0;
+    padding:14px 0;
 }
 
 .history-item:last-child{
@@ -229,7 +221,22 @@ input{
 
 .history-drug{
     font-weight:bold;
-    font-size:16px;
+    font-size:17px;
+    margin-bottom:7px;
+}
+
+.history-info{
+    font-size:13px;
+    margin-top:5px;
+}
+
+.history-date{
+    margin-top:9px;
+    padding:9px;
+    background:#f4f7f9;
+    border-radius:8px;
+    font-size:13px;
+    font-weight:bold;
 }
 
 .small{
@@ -243,7 +250,7 @@ input{
     color:white;
     font-size:12px;
     padding:7px 10px;
-    margin-top:8px;
+    margin-top:9px;
 }
 
 .danger{
@@ -267,10 +274,9 @@ input{
     display:none;
 }
 
-hr{
-    border:0;
-    border-top:1px solid #eee;
-    margin:14px 0;
+.loading{
+    font-weight:bold;
+    color:#1976d2;
 }
 </style>
 </head>
@@ -284,7 +290,9 @@ hr{
 
 <div class="container">
 
-<!-- ================= CAMERA ================= -->
+<!-- =====================================================
+     1. KAMERA & SCAN
+===================================================== -->
 
 <div class="card">
 
@@ -327,7 +335,9 @@ hr{
 </div>
 
 
-<!-- ================= HASIL SCAN ================= -->
+<!-- =====================================================
+     2. HASIL SCAN
+===================================================== -->
 
 <div
     id="scanResultCard"
@@ -361,7 +371,9 @@ hr{
 </div>
 
 
-<!-- ================= STOK ================= -->
+<!-- =====================================================
+     3. STOK
+===================================================== -->
 
 <div class="card">
 
@@ -372,7 +384,9 @@ hr{
 </div>
 
 
-<!-- ================= FORMULARIUM ================= -->
+<!-- =====================================================
+     4. FORMULARIUM
+===================================================== -->
 
 <div class="card">
 
@@ -383,7 +397,9 @@ hr{
 </div>
 
 
-<!-- ================= PEMAKAIAN ================= -->
+<!-- =====================================================
+     5. PEMAKAIAN MANUAL
+===================================================== -->
 
 <div class="card">
 
@@ -433,7 +449,9 @@ hr{
 </div>
 
 
-<!-- ================= RIWAYAT ================= -->
+<!-- =====================================================
+     6. RIWAYAT PEMAKAIAN
+===================================================== -->
 
 <div class="card">
 
@@ -450,7 +468,9 @@ hr{
 </div>
 
 
-<!-- ================= PRINT ================= -->
+<!-- =====================================================
+     7. PRINT LABEL
+===================================================== -->
 
 <div class="card">
 
@@ -498,7 +518,7 @@ hr{
 <script>
 
 /* =====================================================
-   DAFTAR OBAT
+   DAFTAR 14 OBAT EMERGENCY
 ===================================================== */
 
 const drugs = [
@@ -522,29 +542,39 @@ const drugs = [
 
 
 /* =====================================================
-   STORAGE
+   LOAD DATA STORAGE
 ===================================================== */
 
 let stock =
     JSON.parse(
-        localStorage.getItem("smartTrolleyStock")
+        localStorage.getItem(
+            "smartTrolleyStock"
+        )
     ) || {};
+
 
 let usageHistory =
     JSON.parse(
-        localStorage.getItem("smartTrolleyUsageHistory")
+        localStorage.getItem(
+            "smartTrolleyUsageHistory"
+        )
     ) || [];
 
 
 /* =====================================================
-   BERSIHKAN DATA LAMA
+   HAPUS ALKOHOL DARI DATA LAMA
 ===================================================== */
 
 delete stock["Alkohol 70%"];
 
+
+/* Pastikan semua obat ada */
+
 drugs.forEach(drug => {
 
-    if(typeof stock[drug] !== "number"){
+    if(
+        typeof stock[drug] !== "number"
+    ){
 
         stock[drug] = 0;
 
@@ -556,7 +586,7 @@ saveStock();
 
 
 /* =====================================================
-   CAMERA
+   CAMERA VARIABLES
 ===================================================== */
 
 let cameraStream = null;
@@ -605,10 +635,16 @@ async function startCamera(){
 
             });
 
-        document.getElementById("video").srcObject =
+
+        document.getElementById(
+            "video"
+        ).srcObject =
             cameraStream;
 
-        document.getElementById("scanStatus").innerText =
+
+        document.getElementById(
+            "scanStatus"
+        ).innerText =
             "Kamera siap digunakan";
 
     }
@@ -617,7 +653,9 @@ async function startCamera(){
 
         console.error(error);
 
-        document.getElementById("scanStatus").innerText =
+        document.getElementById(
+            "scanStatus"
+        ).innerText =
             "❌ Kamera tidak dapat dibuka. Cek izin kamera.";
 
     }
@@ -636,30 +674,42 @@ function setZoom(value){
     document
         .getElementById("zoom2")
         .classList
-        .toggle("active", value === 2);
+        .toggle(
+            "active",
+            value === 2
+        );
 
     document
         .getElementById("zoom25")
         .classList
-        .toggle("active", value === 2.5);
+        .toggle(
+            "active",
+            value === 2.5
+        );
 
-    document.getElementById("scanStatus").innerText =
+    document.getElementById(
+        "scanStatus"
+    ).innerText =
         "Zoom " + value + "× dipilih";
 
 }
 
 
 /* =====================================================
-   CAPTURE FRAME
+   CAPTURE
 ===================================================== */
 
 function captureFrame(){
 
     const video =
-        document.getElementById("video");
+        document.getElementById(
+            "video"
+        );
 
     const canvas =
-        document.getElementById("canvas");
+        document.getElementById(
+            "canvas"
+        );
 
     if(!video.videoWidth){
 
@@ -672,24 +722,18 @@ function captureFrame(){
     const ctx =
         canvas.getContext("2d");
 
-    const width =
+    canvas.width =
         video.videoWidth;
 
-    const height =
-        video.videoHeight;
-
-    canvas.width =
-        width;
-
     canvas.height =
-        height;
+        video.videoHeight;
 
     ctx.drawImage(
         video,
         0,
         0,
-        width,
-        height
+        canvas.width,
+        canvas.height
     );
 
     return canvas;
@@ -698,7 +742,7 @@ function captureFrame(){
 
 
 /* =====================================================
-   ENHANCE IMAGE
+   IMAGE ENHANCEMENT
 ===================================================== */
 
 function enhanceCanvas(
@@ -708,16 +752,15 @@ function enhanceCanvas(
 ){
 
     const output =
-        document.createElement("canvas");
+        document.createElement(
+            "canvas"
+        );
 
-    const width =
+    output.width =
         sourceCanvas.width * scale;
 
-    const height =
+    output.height =
         sourceCanvas.height * scale;
-
-    output.width = width;
-    output.height = height;
 
     const ctx =
         output.getContext("2d");
@@ -726,16 +769,16 @@ function enhanceCanvas(
         sourceCanvas,
         0,
         0,
-        width,
-        height
+        output.width,
+        output.height
     );
 
     const image =
         ctx.getImageData(
             0,
             0,
-            width,
-            height
+            output.width,
+            output.height
         );
 
     const data =
@@ -752,9 +795,10 @@ function enhanceCanvas(
         let b = data[i + 2];
 
         let gray =
-            0.299*r +
-            0.587*g +
-            0.114*b;
+            0.299 * r +
+            0.587 * g +
+            0.114 * b;
+
 
         if(mode === "contrast"){
 
@@ -763,12 +807,16 @@ function enhanceCanvas(
 
         }
 
+
         if(mode === "threshold"){
 
             gray =
-                gray > 145 ? 255 : 0;
+                gray > 145
+                    ? 255
+                    : 0;
 
         }
+
 
         gray =
             Math.max(
@@ -779,16 +827,18 @@ function enhanceCanvas(
                 )
             );
 
+
         data[i] =
             gray;
 
-        data[i+1] =
+        data[i + 1] =
             gray;
 
-        data[i+2] =
+        data[i + 2] =
             gray;
 
     }
+
 
     ctx.putImageData(
         image,
@@ -796,13 +846,14 @@ function enhanceCanvas(
         0
     );
 
+
     return output;
 
 }
 
 
 /* =====================================================
-   NORMALIZE OCR TEXT
+   NORMALIZE TEXT
 ===================================================== */
 
 function normalizeText(text){
@@ -812,8 +863,14 @@ function normalizeText(text){
         .replace(/0/g,"O")
         .replace(/1/g,"I")
         .replace(/5/g,"S")
-        .replace(/[^A-Z0-9\s]/g," ")
-        .replace(/\s+/g," ")
+        .replace(
+            /[^A-Z0-9\s]/g,
+            " "
+        )
+        .replace(
+            /\s+/g,
+            " "
+        )
         .trim();
 
 }
@@ -899,7 +956,11 @@ function levenshtein(a,b){
 
     }
 
-    return matrix[b.length][a.length];
+    return matrix[
+        b.length
+    ][
+        a.length
+    ];
 
 }
 
@@ -910,8 +971,11 @@ function levenshtein(a,b){
 
 function similarity(a,b){
 
-    a = compactText(a);
-    b = compactText(b);
+    a =
+        compactText(a);
+
+    b =
+        compactText(b);
 
     if(!a || !b){
 
@@ -935,7 +999,7 @@ function similarity(a,b){
 
 
 /* =====================================================
-   IDENTIFY DRUG
+   DRUG ALIASES
 ===================================================== */
 
 function identifyDrug(text){
@@ -945,6 +1009,7 @@ function identifyDrug(text){
 
     const compact =
         compactText(text);
+
 
     const aliases = {
 
@@ -1063,7 +1128,8 @@ function identifyDrug(text){
     };
 
 
-    /* PRIORITAS ALIAS */
+    /* CEK ALIAS */
+
     for(
         const drug of drugs
     ){
@@ -1082,8 +1148,11 @@ function identifyDrug(text){
             ){
 
                 return {
+
                     drug:drug,
+
                     confidence:0.96
+
                 };
 
             }
@@ -1093,13 +1162,15 @@ function identifyDrug(text){
     }
 
 
-    /* CEK KATA PER KATA */
+    /* FUZZY MATCH */
+
     const words =
         normalized.split(" ");
 
     let bestDrug = null;
 
     let bestScore = 0;
+
 
     for(
         const drug of drugs
@@ -1109,6 +1180,7 @@ function identifyDrug(text){
             drug
                 .toUpperCase()
                 .split(" ");
+
 
         for(
             const word of words
@@ -1120,6 +1192,7 @@ function identifyDrug(text){
 
             }
 
+
             for(
                 const target of drugWords
             ){
@@ -1129,6 +1202,7 @@ function identifyDrug(text){
                         word,
                         target
                     );
+
 
                 if(
                     score > bestScore
@@ -1164,6 +1238,7 @@ function identifyDrug(text){
 
     }
 
+
     return null;
 
 }
@@ -1192,7 +1267,7 @@ async function getOCRWorker(){
 
 
 /* =====================================================
-   OCR
+   OCR READ
 ===================================================== */
 
 async function readOCR(canvas){
@@ -1211,7 +1286,7 @@ async function readOCR(canvas){
 
 
 /* =====================================================
-   SCAN MEDICINE
+   SCAN
 ===================================================== */
 
 async function scanMedicine(){
@@ -1225,6 +1300,7 @@ async function scanMedicine(){
     isScanning = true;
 
     detectedDrug = null;
+
 
     const card =
         document.getElementById(
@@ -1246,30 +1322,38 @@ async function scanMedicine(){
             "scanStatus"
         );
 
-    card.classList.remove("hidden");
+
+    card.classList.remove(
+        "hidden"
+    );
+
 
     resultBox.innerText =
         "⏳ Membaca obat...";
 
+
     confidenceBox.innerText =
         "";
 
+
     status.innerHTML =
         '<span class="loading">OCR sedang membaca gambar...</span>';
+
 
     try{
 
         const baseCanvas =
             captureFrame();
 
+
         const candidates = [];
 
-        /* Gambar asli */
+
         candidates.push(
             baseCanvas
         );
 
-        /* Zoom sesuai tombol */
+
         candidates.push(
             enhanceCanvas(
                 baseCanvas,
@@ -1278,7 +1362,7 @@ async function scanMedicine(){
             )
         );
 
-        /* Contrast */
+
         candidates.push(
             enhanceCanvas(
                 baseCanvas,
@@ -1287,7 +1371,7 @@ async function scanMedicine(){
             )
         );
 
-        /* Threshold */
+
         candidates.push(
             enhanceCanvas(
                 baseCanvas,
@@ -1296,9 +1380,11 @@ async function scanMedicine(){
             )
         );
 
+
         let found = null;
 
         let allText = "";
+
 
         for(
             let i=0;
@@ -1313,22 +1399,27 @@ async function scanMedicine(){
                 candidates.length +
                 "...";
 
+
             const text =
                 await readOCR(
                     candidates[i]
                 );
 
+
             allText +=
                 " " + text;
+
 
             const result =
                 identifyDrug(
                     text
                 );
 
+
             if(result){
 
-                found = result;
+                found =
+                    result;
 
                 break;
 
@@ -1352,8 +1443,11 @@ async function scanMedicine(){
             detectedDrug =
                 found.drug;
 
+
             resultBox.innerText =
-                "💊 " + found.drug;
+                "💊 " +
+                found.drug;
+
 
             confidenceBox.innerText =
                 "Hasil pengenalan: " +
@@ -1362,17 +1456,21 @@ async function scanMedicine(){
                 ) +
                 "%";
 
+
             status.innerText =
                 "Silakan cek nama obat sebelum Approve.";
 
         }
+
         else{
 
             resultBox.innerText =
                 "❌ Obat tidak dikenali";
 
+
             confidenceBox.innerText =
                 "Coba arahkan kamera lebih dekat ke nama obat.";
+
 
             status.innerText =
                 "Silakan Scan Ulang.";
@@ -1385,16 +1483,20 @@ async function scanMedicine(){
 
         console.error(error);
 
+
         resultBox.innerText =
             "❌ Gagal membaca gambar";
 
+
         confidenceBox.innerText =
             "Pastikan kamera aktif dan tulisan obat terlihat jelas.";
+
 
         status.innerText =
             "Terjadi kesalahan saat OCR.";
 
     }
+
 
     isScanning = false;
 
@@ -1417,18 +1519,23 @@ function approveMedicine(){
 
     }
 
-    /* SATU-SATUNYA TITIK STOK +1 */
+
+    /* HANYA APPROVE YANG MENAMBAH STOK */
+
     stock[detectedDrug] =
         (stock[detectedDrug] || 0) + 1;
+
 
     saveStock();
 
     renderStock();
 
+
     alert(
         detectedDrug +
         " berhasil ditambahkan ke stok."
     );
+
 
     resetScan();
 
@@ -1443,6 +1550,7 @@ function resetScan(){
 
     detectedDrug = null;
 
+
     document
         .getElementById(
             "scanResultCard"
@@ -1450,17 +1558,21 @@ function resetScan(){
         .classList
         .add("hidden");
 
+
     document
         .getElementById(
             "scanResult"
         )
-        .innerText = "-";
+        .innerText =
+        "-";
+
 
     document
         .getElementById(
             "confidenceText"
         )
-        .innerText = "";
+        .innerText =
+        "";
 
 }
 
@@ -1489,14 +1601,20 @@ function changeStock(
 ){
 
     stock[drug] =
-        Number(stock[drug] || 0) +
+        Number(
+            stock[drug] || 0
+        ) +
         amount;
 
-    if(stock[drug] < 0){
+
+    if(
+        stock[drug] < 0
+    ){
 
         stock[drug] = 0;
 
     }
+
 
     saveStock();
 
@@ -1518,6 +1636,7 @@ function renderStock(){
 
     container.innerHTML = "";
 
+
     drugs.forEach(drug => {
 
         const row =
@@ -1527,6 +1646,7 @@ function renderStock(){
 
         row.className =
             "stock-row";
+
 
         row.innerHTML = `
 
@@ -1554,7 +1674,10 @@ function renderStock(){
 
         `;
 
-        container.appendChild(row);
+
+        container.appendChild(
+            row
+        );
 
     });
 
@@ -1562,7 +1685,7 @@ function renderStock(){
 
 
 /* =====================================================
-   RENDER FORMULARY
+   FORMULARIUM
 ===================================================== */
 
 function renderFormulary(){
@@ -1574,6 +1697,7 @@ function renderFormulary(){
 
     container.innerHTML = "";
 
+
     drugs.forEach(drug => {
 
         const row =
@@ -1583,6 +1707,7 @@ function renderFormulary(){
 
         row.className =
             "formulary-row";
+
 
         row.innerHTML = `
 
@@ -1600,7 +1725,10 @@ function renderFormulary(){
 
         `;
 
-        container.appendChild(row);
+
+        container.appendChild(
+            row
+        );
 
     });
 
@@ -1613,13 +1741,13 @@ function renderFormulary(){
 
 function selectUsageDrug(drug){
 
-    const select =
-        document.getElementById(
+    document
+        .getElementById(
             "usageDrug"
-        );
-
-    select.value =
+        )
+        .value =
         drug;
+
 
     document
         .getElementById(
@@ -1631,7 +1759,7 @@ function selectUsageDrug(drug){
 
 
 /* =====================================================
-   POPULATE SELECTS
+   POPULATE SELECT
 ===================================================== */
 
 function populateSelects(){
@@ -1646,9 +1774,11 @@ function populateSelects(){
             "printDrug"
         );
 
+
     usageSelect.innerHTML = "";
 
     printSelect.innerHTML = "";
+
 
     drugs.forEach(drug => {
 
@@ -1689,6 +1819,82 @@ function populateSelects(){
 
 
 /* =====================================================
+   FORMAT DATE
+===================================================== */
+
+function formatDate(timestamp){
+
+    const date =
+        new Date(timestamp);
+
+
+    const day =
+        String(
+            date.getDate()
+        ).padStart(2,"0");
+
+
+    const month =
+        String(
+            date.getMonth() + 1
+        ).padStart(2,"0");
+
+
+    const year =
+        date.getFullYear();
+
+
+    return (
+        day +
+        "/" +
+        month +
+        "/" +
+        year
+    );
+
+}
+
+
+/* =====================================================
+   FORMAT TIME
+===================================================== */
+
+function formatTime(timestamp){
+
+    const date =
+        new Date(timestamp);
+
+
+    const hours =
+        String(
+            date.getHours()
+        ).padStart(2,"0");
+
+
+    const minutes =
+        String(
+            date.getMinutes()
+        ).padStart(2,"0");
+
+
+    const seconds =
+        String(
+            date.getSeconds()
+        ).padStart(2,"0");
+
+
+    return (
+        hours +
+        ":" +
+        minutes +
+        ":" +
+        seconds
+    );
+
+}
+
+
+/* =====================================================
    ADD USAGE
 ===================================================== */
 
@@ -1701,6 +1907,7 @@ function addUsage(){
             )
             .value;
 
+
     const patient =
         document
             .getElementById(
@@ -1709,6 +1916,7 @@ function addUsage(){
             .value
             .trim();
 
+
     const dose =
         document
             .getElementById(
@@ -1716,6 +1924,7 @@ function addUsage(){
             )
             .value
             .trim();
+
 
     const qty =
         parseInt(
@@ -1749,7 +1958,10 @@ function addUsage(){
     }
 
 
-    if(!qty || qty < 1){
+    if(
+        !qty ||
+        qty < 1
+    ){
 
         alert(
             "Jumlah pemakaian tidak valid."
@@ -1775,40 +1987,44 @@ function addUsage(){
     }
 
 
-    /* WAKTU DICATAT SAAT PEMAKAIAN */
+    /* =================================================
+       TIMESTAMP OTOMATIS
+    ================================================= */
 
-    const now =
-        new Date();
+    const timestamp =
+        Date.now();
 
 
     const date =
-        now.toLocaleDateString(
-            "id-ID"
+        formatDate(
+            timestamp
         );
 
 
     const time =
-        now.toLocaleTimeString(
-            "id-ID",
-            {
-                hour:"2-digit",
-                minute:"2-digit",
-                second:"2-digit"
-            }
+        formatTime(
+            timestamp
         );
 
 
-    /* KURANGI STOK */
+    /* =================================================
+       KURANGI STOK
+    ================================================= */
 
     stock[drug] -= qty;
 
 
-    /* SIMPAN DATA LENGKAP */
+    /* =================================================
+       SIMPAN RIWAYAT LENGKAP
+    ================================================= */
 
     usageHistory.unshift({
 
         id:
-            Date.now(),
+            timestamp,
+
+        timestamp:
+            timestamp,
 
         drug:
             drug,
@@ -1831,9 +2047,14 @@ function addUsage(){
     });
 
 
+    /* SIMPAN KE LOCAL STORAGE */
+
     saveStock();
 
     saveHistory();
+
+
+    /* UPDATE TAMPILAN */
 
     renderStock();
 
@@ -1848,11 +2069,13 @@ function addUsage(){
         )
         .value = "";
 
+
     document
         .getElementById(
             "usageDose"
         )
         .value = "";
+
 
     document
         .getElementById(
@@ -1862,13 +2085,23 @@ function addUsage(){
 
 
     alert(
-        "Pemakaian " +
+        "Pemakaian berhasil dicatat!\n\n" +
+        "Obat: " +
         drug +
-        " berhasil dicatat.\n\n" +
+        "\n" +
+        "Dosis: " +
+        dose +
+        "\n" +
+        "Pasien: " +
+        patient +
+        "\n" +
+        "Jumlah: " +
+        qty +
+        "\n" +
         "Tanggal: " +
         date +
         "\n" +
-        "Waktu: " +
+        "Jam: " +
         time
     );
 
@@ -1902,6 +2135,7 @@ function renderHistory(){
             "historyList"
         );
 
+
     container.innerHTML = "";
 
 
@@ -1924,50 +2158,89 @@ function renderHistory(){
                 "div"
             );
 
+
         div.className =
             "history-item";
 
 
-        const dose =
-            item.dose || "-";
+        /* =================================================
+           PASTIKAN DATA LAMA TETAP AMAN
+        ================================================= */
 
-        const date =
+        let timestamp =
+            item.timestamp;
+
+
+        if(
+            !timestamp &&
+            item.date
+        ){
+
+            timestamp =
+                null;
+
+        }
+
+
+        let date =
             item.date || "-";
 
-        const time =
+
+        let time =
             item.time || "-";
 
-        const patient =
-            item.patient || "-";
 
-        const qty =
-            item.qty || 1;
+        /*
+        Jika data baru punya timestamp,
+        tanggal dan jam dibuat ulang dari timestamp.
+        */
+
+        if(timestamp){
+
+            date =
+                formatDate(
+                    timestamp
+                );
+
+            time =
+                formatTime(
+                    timestamp
+                );
+
+        }
 
 
         div.innerHTML = `
 
             <div class="history-drug">
-                💊 ${item.drug}
+                💊 ${item.drug || "-"}
             </div>
 
-            <div class="small">
-                👤 Pasien: ${patient}
+            <div class="history-info">
+                👤 <b>Pasien:</b>
+                ${item.patient || "-"}
             </div>
 
-            <div class="small">
-                💉 Dosis: ${dose}
+            <div class="history-info">
+                💉 <b>Dosis:</b>
+                ${item.dose || "-"}
             </div>
 
-            <div class="small">
-                🔢 Jumlah: ${qty}
+            <div class="history-info">
+                🔢 <b>Jumlah:</b>
+                ${item.qty || "-"}
             </div>
 
-            <div class="small">
-                📅 Tanggal: ${date}
-            </div>
+            <div class="history-date">
 
-            <div class="small">
-                🕐 Waktu: ${time}
+                📅 Tanggal:
+                <b>${date}</b>
+
+                <br>
+
+                🕐 Jam:
+                <b>${time}</b>
+
             </div>
 
             <button
@@ -1997,12 +2270,13 @@ function renderHistory(){
 
 function deleteHistory(id){
 
-    const confirmDelete =
+    const answer =
         confirm(
             "Hapus riwayat ini?\n\nStok tidak akan dikembalikan."
         );
 
-    if(!confirmDelete){
+
+    if(!answer){
 
         return;
 
@@ -2043,13 +2317,13 @@ function deleteAllHistory(){
     }
 
 
-    const confirmDelete =
+    const answer =
         confirm(
             "Hapus SEMUA riwayat pemakaian?\n\nStok tidak akan dikembalikan."
         );
 
 
-    if(!confirmDelete){
+    if(!answer){
 
         return;
 
@@ -2057,6 +2331,7 @@ function deleteAllHistory(){
 
 
     usageHistory = [];
+
 
     saveHistory();
 
@@ -2078,6 +2353,7 @@ function printLabel(){
             )
             .value;
 
+
     const dose =
         document
             .getElementById(
@@ -2085,6 +2361,7 @@ function printLabel(){
             )
             .value
             .trim();
+
 
     const patient =
         document
@@ -2117,10 +2394,34 @@ function printLabel(){
     }
 
 
-    /* SIMPAN DATA PRINT TERAKHIR */
+    /* =================================================
+       WAKTU PRINT
+    ================================================= */
+
+    const timestamp =
+        Date.now();
+
+
+    const date =
+        formatDate(
+            timestamp
+        );
+
+
+    const time =
+        formatTime(
+            timestamp
+        );
+
+
+    /* =================================================
+       SIMPAN DATA PRINT TERAKHIR
+    ================================================= */
 
     localStorage.setItem(
+
         "smartTrolleyLastPrint",
+
         JSON.stringify({
 
             drug:
@@ -2133,31 +2434,13 @@ function printLabel(){
                 patient
 
         })
+
     );
 
 
-    /* TANGGAL & JAM PRINT */
-
-    const now =
-        new Date();
-
-
-    const date =
-        now.toLocaleDateString(
-            "id-ID"
-        );
-
-
-    const time =
-        now.toLocaleTimeString(
-            "id-ID",
-            {
-                hour:"2-digit",
-                minute:"2-digit",
-                second:"2-digit"
-            }
-        );
-
+    /* =================================================
+       BUKA WINDOW PRINT
+    ================================================= */
 
     const printWindow =
         window.open(
@@ -2223,9 +2506,19 @@ body{
 
 .title{
 
-    font-size:12px;
+    font-size:11px;
+
+    font-weight:bold;
 
     margin-bottom:6px;
+
+}
+
+.line{
+
+    border-top:1px solid #000;
+
+    margin:6px 0;
 
 }
 
@@ -2235,7 +2528,7 @@ body{
 
     font-weight:bold;
 
-    margin-bottom:8px;
+    margin:8px 0;
 
 }
 
@@ -2253,24 +2546,23 @@ body{
 
     font-size:14px;
 
-    margin-bottom:7px;
+    margin-bottom:8px;
 
 }
 
-.date,
+.date{
+
+    font-size:12px;
+
+    margin-top:5px;
+
+}
+
 .time{
 
     font-size:12px;
 
     margin-top:4px;
-
-}
-
-.line{
-
-    border-top:1px solid #000;
-
-    margin:7px 0;
 
 }
 
@@ -2291,19 +2583,21 @@ body{
 </div>
 
 <div class="dose">
-    Dosis: ${dose}
+    💉 Dosis: ${dose}
 </div>
 
 <div class="patient">
-    Pasien: ${patient}
+    👤 Pasien: ${patient}
 </div>
 
+<div class="line"></div>
+
 <div class="date">
-    Tanggal: ${date}
+    📅 Tanggal: ${date}
 </div>
 
 <div class="time">
-    Waktu: ${time}
+    🕐 Jam: ${time}
 </div>
 
 </body>
@@ -2331,7 +2625,7 @@ body{
 
 
 /* =====================================================
-   LOAD LAST PRINT DATA
+   LOAD DATA PRINT TERAKHIR
 ===================================================== */
 
 function loadLastPrint(){
