@@ -9,7 +9,6 @@
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 
 <style>
-
 * {
     box-sizing: border-box;
 }
@@ -113,9 +112,7 @@ button:disabled {
     color: white;
 }
 
-/* =========================
-   CAMERA
-========================= */
+/* CAMERA */
 
 .camera-wrapper {
     position: relative;
@@ -204,25 +201,7 @@ label {
     overflow-y: auto;
 }
 
-/* =========================
-   FORMULARIUM
-========================= */
-
-.formulary-button {
-    background: #f1f3f5;
-    color: #222;
-    text-align: left;
-    border: 1px solid #dee2e6;
-    margin-top: 6px;
-}
-
-.formulary-button:hover {
-    background: #e9ecef;
-}
-
-/* =========================
-   STOCK
-========================= */
+/* STOCK */
 
 .stock-item {
     display: flex;
@@ -256,9 +235,21 @@ label {
     font-weight: bold;
 }
 
-/* =========================
-   PEMAKAIAN
-========================= */
+/* FORMULARIUM */
+
+.formulary-button {
+    background: #f1f3f5;
+    color: #222;
+    text-align: left;
+    border: 1px solid #dee2e6;
+    margin-top: 6px;
+}
+
+.formulary-button:hover {
+    background: #e9ecef;
+}
+
+/* PEMAKAIAN */
 
 .usage-box {
     background: #fff4e6;
@@ -276,9 +267,7 @@ label {
     margin-bottom: 12px;
 }
 
-/* =========================
-   RIWAYAT
-========================= */
+/* RIWAYAT */
 
 .history-item {
     border: 1px solid #dee2e6;
@@ -298,9 +287,7 @@ label {
     padding: 15px;
 }
 
-/* =========================
-   PRINT
-========================= */
+/* PRINT */
 
 #printArea {
     display: none;
@@ -333,7 +320,6 @@ label {
         margin: 0;
     }
 }
-
 </style>
 </head>
 
@@ -341,9 +327,7 @@ label {
 
 <header>
 
-    <h1>
-        SMART NURSING TROLLEY SYSTEM
-    </h1>
+    <h1>SMART NURSING TROLLEY SYSTEM</h1>
 
     <p>
         Emergency Drug Inventory System
@@ -356,14 +340,12 @@ label {
 
 
 <!-- =====================================================
-     CAMERA
+     1. CAMERA
 ===================================================== -->
 
 <div class="card">
 
-    <h2>
-        📷 Kamera & Scan Obat
-    </h2>
+    <h2>📷 Kamera & Scan Obat</h2>
 
     <button
         class="btn-camera"
@@ -373,7 +355,6 @@ label {
 
     </button>
 
-
     <button
         class="btn-stop"
         onclick="stopCamera()">
@@ -382,7 +363,6 @@ label {
 
     </button>
 
-
     <div class="camera-wrapper">
 
         <video
@@ -390,7 +370,6 @@ label {
             autoplay
             playsinline>
         </video>
-
 
         <div class="scan-guide">
 
@@ -404,7 +383,6 @@ label {
 
     </div>
 
-
     <div
         id="cameraStatus"
         class="status">
@@ -412,7 +390,6 @@ label {
         Kamera belum digunakan
 
     </div>
-
 
     <button
         id="scanButton"
@@ -423,7 +400,6 @@ label {
 
     </button>
 
-
     <canvas
         id="canvas"
         class="hidden">
@@ -433,17 +409,14 @@ label {
 
 
 <!-- =====================================================
-     HASIL SCAN
+     2. HASIL SCAN
 ===================================================== -->
 
 <div
     class="card"
     id="scanResultCard">
 
-    <h2>
-        🔎 Hasil Scan
-    </h2>
-
+    <h2>🔎 Hasil Scan</h2>
 
     <div
         id="detectedMedicine"
@@ -453,9 +426,7 @@ label {
 
     </div>
 
-
     <div id="ocrText"></div>
-
 
     <button
         id="approveBtn"
@@ -465,7 +436,6 @@ label {
         ✅ Approve & Tambah Stok +1
 
     </button>
-
 
     <button
         id="cancelBtn"
@@ -480,15 +450,35 @@ label {
 
 
 <!-- =====================================================
-     FORMULARIUM
+     3. STOK OBAT
 ===================================================== -->
 
 <div class="card">
 
-    <h2>
-        📋 Daftar Formularium
-    </h2>
+    <h2>💊 Stok Obat</h2>
 
+    <p style="
+        font-size:13px;
+        color:#666;
+    ">
+
+        Approve hasil scan akan menambah
+        stok sebanyak 1 unit.
+
+    </p>
+
+    <div id="stockList"></div>
+
+</div>
+
+
+<!-- =====================================================
+     4. FORMULARIUM
+===================================================== -->
+
+<div class="card">
+
+    <h2>📋 Daftar Formularium</h2>
 
     <p style="
         font-size:13px;
@@ -500,22 +490,18 @@ label {
 
     </p>
 
-
     <div id="formularyList"></div>
 
 </div>
 
 
 <!-- =====================================================
-     PEMAKAIAN MANUAL
+     5. PEMAKAIAN MANUAL
 ===================================================== -->
 
 <div class="card">
 
-    <h2>
-        📝 Pemakaian Obat Manual
-    </h2>
-
+    <h2>📝 Pemakaian Obat Manual</h2>
 
     <div
         id="usageEmpty"
@@ -527,11 +513,9 @@ label {
 
     </div>
 
-
     <div
         id="usageForm"
         class="usage-box hidden">
-
 
         <div class="selected-medicine">
 
@@ -553,7 +537,6 @@ label {
 
         </div>
 
-
         <label>
             Jumlah Dipakai
         </label>
@@ -564,7 +547,6 @@ label {
             min="1"
             value="1">
 
-
         <label>
             Tanggal Pemakaian
         </label>
@@ -573,7 +555,6 @@ label {
             type="date"
             id="usageDate">
 
-
         <label>
             Jam Pemakaian
         </label>
@@ -581,7 +562,6 @@ label {
         <input
             type="time"
             id="usageTime">
-
 
         <label>
             Nama / ID Pasien
@@ -592,7 +572,6 @@ label {
             id="usagePatient"
             placeholder="Contoh: Ny. A / RM 123456">
 
-
         <label>
             Ruangan / Bed
         </label>
@@ -601,7 +580,6 @@ label {
             type="text"
             id="usageRoom"
             placeholder="Contoh: Melati 5 / Bed 3">
-
 
         <label>
             Keterangan
@@ -612,7 +590,6 @@ label {
             id="usageNote"
             placeholder="Opsional">
 
-
         <button
             class="btn-save"
             onclick="saveUsage()">
@@ -620,7 +597,6 @@ label {
             ✅ Simpan Pemakaian
 
         </button>
-
 
         <button
             class="btn-secondary"
@@ -636,53 +612,21 @@ label {
 
 
 <!-- =====================================================
-     STOK
+     6. RIWAYAT PEMAKAIAN
 ===================================================== -->
 
 <div class="card">
 
-    <h2>
-        💊 Stok Obat
-    </h2>
-
-
-    <p style="
-        font-size:13px;
-        color:#666;
-    ">
-
-        Approve hasil scan akan menambah
-        stok +1.
-
-    </p>
-
-
-    <div id="stockList"></div>
-
-</div>
-
-
-<!-- =====================================================
-     RIWAYAT PEMAKAIAN
-===================================================== -->
-
-<div class="card">
-
-    <h2>
-        📜 Riwayat Pemakaian
-    </h2>
-
+    <h2>📜 Riwayat Pemakaian</h2>
 
     <label>
         Filter berdasarkan tanggal
     </label>
 
-
     <input
         type="date"
         id="historyDate"
         onchange="renderHistory()">
-
 
     <button
         class="btn-secondary"
@@ -692,7 +636,6 @@ label {
 
     </button>
 
-
     <button
         class="btn-cancel"
         onclick="deleteAllHistory()">
@@ -700,7 +643,6 @@ label {
         🗑️ Hapus Semua Riwayat
 
     </button>
-
 
     <div
         id="historyList"
@@ -712,15 +654,12 @@ label {
 
 
 <!-- =====================================================
-     PRINT LABEL
+     7. PRINT LABEL
 ===================================================== -->
 
 <div class="card">
 
-    <h2>
-        🖨️ Print Label
-    </h2>
-
+    <h2>🖨️ Print Label</h2>
 
     <label>
         Nama Pasien
@@ -731,7 +670,6 @@ label {
         id="patientName"
         placeholder="Nama pasien">
 
-
     <label>
         Nama Obat
     </label>
@@ -741,7 +679,6 @@ label {
         id="labelMedicine"
         placeholder="Nama obat">
 
-
     <label>
         Dosis / Konsentrasi
     </label>
@@ -750,7 +687,6 @@ label {
         type="text"
         id="labelDose"
         placeholder="Tulis dosis / konsentrasi">
-
 
     <button
         class="btn-print"
@@ -779,9 +715,7 @@ label {
 
     </div>
 
-
     <hr>
-
 
     <div>
 
@@ -793,9 +727,7 @@ label {
 
     </div>
 
-
     <br>
-
 
     <div>
 
@@ -807,9 +739,7 @@ label {
 
     </div>
 
-
     <br>
-
 
     <div>
 
@@ -821,9 +751,7 @@ label {
 
     </div>
 
-
     <br>
-
 
     <div>
 
@@ -835,9 +763,7 @@ label {
 
     </div>
 
-
     <hr>
-
 
     <div style="text-align:center;">
 
@@ -851,7 +777,7 @@ label {
 <script>
 
 /* =====================================================
-   FORMULARIUM
+   FORMULARIUM INTERNAL
 ===================================================== */
 
 const formulary = {
@@ -1030,8 +956,7 @@ Object.keys(formulary).forEach(
 
 
 /*
-   HAPUS ALKOHOL 70%
-   DARI DATA LAMA
+   HAPUS DATA ALKOHOL LAMA
 */
 
 delete stock["Alkohol 70%"];
@@ -1053,11 +978,8 @@ renderHistory();
 function saveStock() {
 
     localStorage.setItem(
-
         "smartTrolleyStock",
-
         JSON.stringify(stock)
-
     );
 
 }
@@ -1128,16 +1050,24 @@ function renderStock() {
 
                     <button
                         onclick="changeStock('${drug}', -1)">
+
                         −
+
                     </button>
 
+
                     <span class="stock-number">
+
                         ${qty}
+
                     </span>
+
 
                     <button
                         onclick="changeStock('${drug}', 1)">
+
                         +
+
                     </button>
 
                 </div>
@@ -1211,8 +1141,7 @@ function renderFormulary() {
 
                 💊 ${drug}
 
-                <span
-                    style="float:right;">
+                <span style="float:right;">
 
                     Stok:
                     ${stock[drug] || 0}
@@ -1285,9 +1214,11 @@ function selectMedicineForUsage(
         "usageForm"
     ).scrollIntoView({
 
-        behavior: "smooth",
+        behavior:
+            "smooth",
 
-        block: "center"
+        block:
+            "center"
 
     });
 
@@ -1295,7 +1226,7 @@ function selectMedicineForUsage(
 
 
 /* =====================================================
-   DATE & TIME
+   CURRENT DATE TIME
 ===================================================== */
 
 function setCurrentDateTime() {
@@ -1359,7 +1290,7 @@ function setCurrentDateTime() {
 
 
 /* =====================================================
-   SIMPAN PEMAKAIAN
+   SAVE USAGE
 ===================================================== */
 
 function saveUsage() {
@@ -1511,7 +1442,7 @@ function saveUsage() {
 
 
     /*
-       SIMPAN RIWAYAT
+       TAMBAHKAN RIWAYAT
     */
 
     history.unshift({
@@ -1547,7 +1478,9 @@ function saveUsage() {
 
         "smartTrolleyUsageHistory",
 
-        JSON.stringify(history)
+        JSON.stringify(
+            history
+        )
 
     );
 
@@ -1590,7 +1523,7 @@ function saveUsage() {
 
 
 /* =====================================================
-   BATAL PEMAKAIAN
+   CANCEL USAGE
 ===================================================== */
 
 function cancelUsage() {
@@ -1615,17 +1548,20 @@ function cancelUsage() {
 
     document.getElementById(
         "usagePatient"
-    ).value = "";
+    ).value =
+        "";
 
 
     document.getElementById(
         "usageRoom"
-    ).value = "";
+    ).value =
+        "";
 
 
     document.getElementById(
         "usageNote"
-    ).value = "";
+    ).value =
+        "";
 
 }
 
@@ -1704,10 +1640,12 @@ function renderHistory() {
             div.innerHTML = `
 
                 <strong>
+
                     💊
                     ${escapeHTML(
                         item.medicine
                     )}
+
                 </strong>
 
                 <br><br>
@@ -1727,6 +1665,7 @@ function renderHistory() {
                 <br>
 
                 🔢 Jumlah dipakai:
+
                 <strong>
                     ${item.quantity}
                 </strong>
@@ -1734,6 +1673,7 @@ function renderHistory() {
                 <br>
 
                 👤 Pasien:
+
                 ${escapeHTML(
                     item.patient
                 )}
@@ -1741,6 +1681,7 @@ function renderHistory() {
                 <br>
 
                 🛏️ Ruangan / Bed:
+
                 ${escapeHTML(
                     item.room
                 )}
@@ -1748,6 +1689,7 @@ function renderHistory() {
                 <br>
 
                 📝 Keterangan:
+
                 ${escapeHTML(
                     item.note
                 )}
@@ -1773,10 +1715,12 @@ function renderHistory() {
 
 
 /* =====================================================
-   HAPUS SATU RIWAYAT
+   DELETE ONE HISTORY
 ===================================================== */
 
-function deleteHistory(id) {
+function deleteHistory(
+    id
+) {
 
     const confirmDelete =
         confirm(
@@ -1823,7 +1767,7 @@ function deleteHistory(id) {
 
 
 /* =====================================================
-   HAPUS SEMUA RIWAYAT
+   DELETE ALL HISTORY
 ===================================================== */
 
 function deleteAllHistory() {
@@ -1878,14 +1822,15 @@ function deleteAllHistory() {
 
 
 /* =====================================================
-   CLEAR FILTER
+   CLEAR HISTORY FILTER
 ===================================================== */
 
 function clearHistoryFilter() {
 
     document.getElementById(
         "historyDate"
-    ).value = "";
+    ).value =
+        "";
 
 
     renderHistory();
@@ -1938,7 +1883,9 @@ function formatDate(
    ESCAPE HTML
 ===================================================== */
 
-function escapeHTML(text) {
+function escapeHTML(
+    text
+) {
 
     return String(text)
 
@@ -1971,7 +1918,7 @@ function escapeHTML(text) {
 
 
 /* =====================================================
-   OPEN CAMERA
+   OPEN BACK CAMERA
 ===================================================== */
 
 async function openBackCamera() {
@@ -2039,7 +1986,8 @@ async function openBackCamera() {
 
                     },
 
-                    audio: false
+                    audio:
+                        false
 
                 });
 
@@ -2074,8 +2022,10 @@ async function openBackCamera() {
                     advanced: [
 
                         {
+
                             focusMode:
                                 "continuous"
+
                         }
 
                     ]
@@ -2155,7 +2105,9 @@ function stopCamera() {
    NORMALIZE TEXT
 ===================================================== */
 
-function normalizeText(text) {
+function normalizeText(
+    text
+) {
 
     return text
 
@@ -2195,7 +2147,9 @@ function normalizeText(text) {
    NORMALIZE OCR WORD
 ===================================================== */
 
-function normalizeOCRWord(text) {
+function normalizeOCRWord(
+    text
+) {
 
     return text
 
@@ -2247,7 +2201,8 @@ function levenshtein(
         i++
     ) {
 
-        matrix[i] = [i];
+        matrix[i] =
+            [i];
 
     }
 
@@ -2393,14 +2348,16 @@ function fuzzyMatch(
             );
 
 
-        let allowed = 1;
+        let allowed =
+            1;
 
 
         if (
             cleanKeyword.length >= 6
         ) {
 
-            allowed = 2;
+            allowed =
+                2;
 
         }
 
@@ -2409,7 +2366,8 @@ function fuzzyMatch(
             cleanKeyword.length >= 10
         ) {
 
-            allowed = 3;
+            allowed =
+                3;
 
         }
 
@@ -2418,7 +2376,8 @@ function fuzzyMatch(
             cleanKeyword.length >= 14
         ) {
 
-            allowed = 4;
+            allowed =
+                4;
 
         }
 
@@ -2440,7 +2399,7 @@ function fuzzyMatch(
 
 
 /* =====================================================
-   SPECIAL MATCH
+   SPECIAL OCR MATCH
 ===================================================== */
 
 function specialMedicineMatch(
@@ -2714,7 +2673,7 @@ async function prepareOCR() {
 
 
 /* =====================================================
-   CREATE ZOOM CANVAS
+   CREATE DIGITAL ZOOM
 ===================================================== */
 
 function createZoomCanvas(
@@ -2811,7 +2770,7 @@ function createZoomCanvas(
 
 
 /* =====================================================
-   ENHANCE CANVAS
+   ENHANCE IMAGE
 ===================================================== */
 
 function enhanceCanvas(
@@ -3049,7 +3008,7 @@ async function recognizeImage(
 
 
 /* =====================================================
-   SCAN OBAT
+   SCAN MEDICINE
 ===================================================== */
 
 async function scanMedicine() {
@@ -3180,9 +3139,7 @@ async function scanMedicine() {
             null;
 
 
-        /* ==========================
-           ZOOM 2X
-        ========================== */
+        /* ZOOM 2X */
 
         document.getElementById(
             "detectedMedicine"
@@ -3224,9 +3181,7 @@ async function scanMedicine() {
             );
 
 
-        /* ==========================
-           ZOOM 3X
-        ========================== */
+        /* ZOOM 3X */
 
         if (!medicine) {
 
@@ -3276,9 +3231,7 @@ async function scanMedicine() {
         }
 
 
-        /* ==========================
-           ZOOM 4X
-        ========================== */
+        /* ZOOM 4X */
 
         if (!medicine) {
 
@@ -3330,9 +3283,7 @@ async function scanMedicine() {
         }
 
 
-        /* ==========================
-           OCR TEXT
-        ========================== */
+        /* OCR TEXT */
 
         document.getElementById(
             "ocrText"
@@ -3346,9 +3297,7 @@ async function scanMedicine() {
             : "Tidak ada tulisan yang terbaca.";
 
 
-        /* ==========================
-           FOUND
-        ========================== */
+        /* FOUND */
 
         if (medicine) {
 
@@ -3418,11 +3367,6 @@ async function scanMedicine() {
             });
 
         }
-
-
-        /* ==========================
-           NOT FOUND
-        ========================== */
 
         else {
 
@@ -3520,8 +3464,11 @@ function approveMedicine() {
 
 
     /*
+       APPROVE TIDAK MASUK
+       KE PEMAKAIAN.
+       
        APPROVE HANYA
-       MENAMBAH STOK.
+       MENAMBAH STOK +1.
     */
 
     stock[medicine] =
@@ -3588,7 +3535,7 @@ function approveMedicine() {
 
 
 /* =====================================================
-   BATAL SCAN
+   CANCEL SCAN
 ===================================================== */
 
 function cancelScan() {
@@ -3712,4 +3659,4 @@ window.addEventListener(
 </script>
 
 </body>
-    </html>
+</html>
