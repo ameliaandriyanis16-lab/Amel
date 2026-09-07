@@ -9,6 +9,7 @@
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 
 <style>
+
 * {
     box-sizing: border-box;
 }
@@ -275,6 +276,10 @@ label {
     margin-bottom: 12px;
 }
 
+/* =========================
+   RIWAYAT
+========================= */
+
 .history-item {
     border: 1px solid #dee2e6;
     border-radius: 9px;
@@ -328,37 +333,55 @@ label {
         margin: 0;
     }
 }
+
 </style>
 </head>
 
 <body>
 
 <header>
-    <h1>SMART NURSING TROLLEY SYSTEM</h1>
-    <p>Emergency Drug Inventory System</p>
+
+    <h1>
+        SMART NURSING TROLLEY SYSTEM
+    </h1>
+
+    <p>
+        Emergency Drug Inventory System
+    </p>
+
 </header>
+
 
 <div class="container">
 
-<!-- =========================
+
+<!-- =====================================================
      CAMERA
-========================= -->
+===================================================== -->
 
 <div class="card">
 
-    <h2>📷 Kamera & Scan Obat</h2>
+    <h2>
+        📷 Kamera & Scan Obat
+    </h2>
 
     <button
         class="btn-camera"
         onclick="openBackCamera()">
+
         📷 Buka Kamera Belakang
+
     </button>
+
 
     <button
         class="btn-stop"
         onclick="stopCamera()">
+
         ⏹️ Matikan Kamera
+
     </button>
+
 
     <div class="camera-wrapper">
 
@@ -368,28 +391,38 @@ label {
             playsinline>
         </video>
 
+
         <div class="scan-guide">
 
             <div class="scan-guide-text">
+
                 Letakkan NAMA OBAT di dalam kotak
+
             </div>
 
         </div>
 
     </div>
 
+
     <div
         id="cameraStatus"
         class="status">
+
         Kamera belum digunakan
+
     </div>
+
 
     <button
         id="scanButton"
         class="btn-scan"
         onclick="scanMedicine()">
+
         🔍 Scan Obat
+
     </button>
+
 
     <canvas
         id="canvas"
@@ -399,66 +432,90 @@ label {
 </div>
 
 
-<!-- =========================
+<!-- =====================================================
      HASIL SCAN
-========================= -->
+===================================================== -->
 
 <div
     class="card"
     id="scanResultCard">
 
-    <h2>🔎 Hasil Scan</h2>
+    <h2>
+        🔎 Hasil Scan
+    </h2>
+
 
     <div
         id="detectedMedicine"
         class="result">
+
         Belum ada hasil scan.
+
     </div>
 
+
     <div id="ocrText"></div>
+
 
     <button
         id="approveBtn"
         class="btn-approve hidden"
         onclick="approveMedicine()">
+
         ✅ Approve & Tambah Stok +1
+
     </button>
+
 
     <button
         id="cancelBtn"
         class="btn-cancel hidden"
         onclick="cancelScan()">
+
         ❌ Batal
+
     </button>
 
 </div>
 
 
-<!-- =========================
+<!-- =====================================================
      FORMULARIUM
-========================= -->
+===================================================== -->
 
 <div class="card">
 
-    <h2>📋 Daftar Formularium</h2>
+    <h2>
+        📋 Daftar Formularium
+    </h2>
 
-    <p style="font-size:13px;color:#666;">
-        Daftar obat dapat dipilih secara manual
-        untuk mencatat pemakaian.
+
+    <p style="
+        font-size:13px;
+        color:#666;
+    ">
+
+        Pilih obat secara manual untuk
+        mencatat pemakaian.
+
     </p>
+
 
     <div id="formularyList"></div>
 
 </div>
 
 
-<!-- =========================
+<!-- =====================================================
      PEMAKAIAN MANUAL
-========================= -->
+===================================================== -->
 
 <div class="card">
 
-    <h2>📝 Pemakaian Obat Manual</h2>
+    <h2>
+        📝 Pemakaian Obat Manual
+    </h2>
+
 
     <div
         id="usageEmpty"
@@ -466,17 +523,22 @@ label {
 
         Pilih obat dari
         <strong>Daftar Formularium</strong>
-        di atas untuk mencatat pemakaian.
+        untuk mencatat pemakaian.
 
     </div>
+
 
     <div
         id="usageForm"
         class="usage-box hidden">
 
+
         <div class="selected-medicine">
 
-            💊 <strong>Obat yang dipilih:</strong>
+            💊
+            <strong>
+                Obat yang dipilih:
+            </strong>
 
             <br>
 
@@ -573,35 +635,48 @@ label {
 </div>
 
 
-<!-- =========================
+<!-- =====================================================
      STOK
-========================= -->
+===================================================== -->
 
 <div class="card">
 
-    <h2>💊 Stok Obat</h2>
+    <h2>
+        💊 Stok Obat
+    </h2>
 
-    <p style="font-size:13px;color:#666;">
-        Approve hasil scan akan menambah stok +1.
-        Stok juga dapat dikoreksi menggunakan tombol + dan −.
+
+    <p style="
+        font-size:13px;
+        color:#666;
+    ">
+
+        Approve hasil scan akan menambah
+        stok +1.
+
     </p>
+
 
     <div id="stockList"></div>
 
 </div>
 
 
-<!-- =========================
+<!-- =====================================================
      RIWAYAT PEMAKAIAN
-========================= -->
+===================================================== -->
 
 <div class="card">
 
-    <h2>📜 Riwayat Pemakaian</h2>
+    <h2>
+        📜 Riwayat Pemakaian
+    </h2>
+
 
     <label>
         Filter berdasarkan tanggal
     </label>
+
 
     <input
         type="date"
@@ -618,21 +693,34 @@ label {
     </button>
 
 
+    <button
+        class="btn-cancel"
+        onclick="deleteAllHistory()">
+
+        🗑️ Hapus Semua Riwayat
+
+    </button>
+
+
     <div
         id="historyList"
         style="margin-top:12px;">
+
     </div>
 
 </div>
 
 
-<!-- =========================
+<!-- =====================================================
      PRINT LABEL
-========================= -->
+===================================================== -->
 
 <div class="card">
 
-    <h2>🖨️ Print Label</h2>
+    <h2>
+        🖨️ Print Label
+    </h2>
+
 
     <label>
         Nama Pasien
@@ -677,48 +765,84 @@ label {
 </div>
 
 
-<!-- =========================
+<!-- =====================================================
      PRINT AREA
-========================= -->
+===================================================== -->
 
 <div id="printArea">
 
     <div style="text-align:center;">
-        <strong>SMART NURSING TROLLEY</strong>
+
+        <strong>
+            SMART NURSING TROLLEY
+        </strong>
+
     </div>
+
 
     <hr>
 
+
     <div>
-        <strong>Nama Pasien:</strong>
+
+        <strong>
+            Nama Pasien:
+        </strong>
+
         <span id="printPatient"></span>
+
     </div>
+
 
     <br>
 
+
     <div>
-        <strong>Nama Obat:</strong>
+
+        <strong>
+            Nama Obat:
+        </strong>
+
         <span id="printMedicine"></span>
+
     </div>
+
 
     <br>
 
+
     <div>
-        <strong>Dosis:</strong>
+
+        <strong>
+            Dosis:
+        </strong>
+
         <span id="printDose"></span>
+
     </div>
+
 
     <br>
 
+
     <div>
-        <strong>Waktu:</strong>
+
+        <strong>
+            Waktu:
+        </strong>
+
         <span id="printTime"></span>
+
     </div>
+
 
     <hr>
+
 
     <div style="text-align:center;">
+
         Emergency Drug
+
     </div>
 
 </div>
@@ -868,9 +992,13 @@ const formulary = {
 ===================================================== */
 
 let cameraStream = null;
+
 let detectedDrug = null;
+
 let selectedUsageDrug = null;
+
 let ocrWorker = null;
+
 let ocrReady = false;
 
 
@@ -886,24 +1014,35 @@ let stock =
     ) || {};
 
 
-Object.keys(formulary).forEach(drug => {
+Object.keys(formulary).forEach(
+    drug => {
 
-    if (stock[drug] === undefined) {
-        stock[drug] = 0;
+        if (
+            stock[drug] === undefined
+        ) {
+
+            stock[drug] = 0;
+
+        }
+
     }
-
-});
+);
 
 
 /*
-   HAPUS ALKOHOL 70% DARI DATA LAMA
+   HAPUS ALKOHOL 70%
+   DARI DATA LAMA
 */
 
 delete stock["Alkohol 70%"];
 
+
 saveStock();
+
 renderStock();
+
 renderFormulary();
+
 renderHistory();
 
 
@@ -914,8 +1053,11 @@ renderHistory();
 function saveStock() {
 
     localStorage.setItem(
+
         "smartTrolleyStock",
+
         JSON.stringify(stock)
+
     );
 
 }
@@ -932,92 +1074,106 @@ function renderStock() {
             "stockList"
         );
 
+
     list.innerHTML = "";
 
 
-    Object.keys(formulary).forEach(drug => {
+    Object.keys(formulary).forEach(
+        drug => {
 
-        const qty =
-            stock[drug] || 0;
-
-
-        const item =
-            document.createElement("div");
-
-        item.className =
-            "stock-item";
+            const qty =
+                stock[drug] || 0;
 
 
-        item.innerHTML = `
+            const item =
+                document.createElement(
+                    "div"
+                );
 
-            <div>
 
-                <strong>${drug}</strong>
+            item.className =
+                "stock-item";
 
-                <br>
 
-                <span class="${
-                    qty <= 2
-                    ? "low-stock"
-                    : ""
-                }">
+            item.innerHTML = `
 
-                    Stok: ${qty}
+                <div>
 
-                    ${
+                    <strong>
+                        ${drug}
+                    </strong>
+
+                    <br>
+
+                    <span class="${
                         qty <= 2
-                        ? " ⚠️"
+                        ? "low-stock"
                         : ""
-                    }
+                    }">
 
-                </span>
+                        Stok: ${qty}
 
-            </div>
+                        ${
+                            qty <= 2
+                            ? " ⚠️"
+                            : ""
+                        }
 
+                    </span>
 
-            <div class="stock-buttons">
-
-                <button
-                    onclick="changeStock('${drug}', -1)">
-                    −
-                </button>
-
-                <span class="stock-number">
-                    ${qty}
-                </span>
-
-                <button
-                    onclick="changeStock('${drug}', 1)">
-                    +
-                </button>
-
-            </div>
-
-        `;
+                </div>
 
 
-        list.appendChild(item);
+                <div class="stock-buttons">
 
-    });
+                    <button
+                        onclick="changeStock('${drug}', -1)">
+                        −
+                    </button>
+
+                    <span class="stock-number">
+                        ${qty}
+                    </span>
+
+                    <button
+                        onclick="changeStock('${drug}', 1)">
+                        +
+                    </button>
+
+                </div>
+
+            `;
+
+
+            list.appendChild(item);
+
+        }
+    );
 
 }
 
 
 /* =====================================================
-   CHANGE STOCK MANUAL
+   CHANGE STOCK
 ===================================================== */
 
-function changeStock(drug, amount) {
+function changeStock(
+    drug,
+    amount
+) {
 
     stock[drug] =
         Math.max(
             0,
-            (stock[drug] || 0) + amount
+            (stock[drug] || 0) +
+            amount
         );
 
 
     saveStock();
+
     renderStock();
+
     renderFormulary();
 
 }
@@ -1034,51 +1190,63 @@ function renderFormulary() {
             "formularyList"
         );
 
+
     list.innerHTML = "";
 
 
-    Object.keys(formulary).forEach(drug => {
+    Object.keys(formulary).forEach(
+        drug => {
 
-        const button =
-            document.createElement(
-                "button"
-            );
-
-
-        button.className =
-            "formulary-button";
-
-
-        button.innerHTML = `
-            💊 ${drug}
-            <span style="float:right;">
-                Stok: ${stock[drug] || 0}
-            </span>
-        `;
-
-
-        button.onclick =
-            function() {
-
-                selectMedicineForUsage(
-                    drug
+            const button =
+                document.createElement(
+                    "button"
                 );
 
-            };
+
+            button.className =
+                "formulary-button";
 
 
-        list.appendChild(button);
+            button.innerHTML = `
 
-    });
+                💊 ${drug}
+
+                <span
+                    style="float:right;">
+
+                    Stok:
+                    ${stock[drug] || 0}
+
+                </span>
+
+            `;
+
+
+            button.onclick =
+                function() {
+
+                    selectMedicineForUsage(
+                        drug
+                    );
+
+                };
+
+
+            list.appendChild(button);
+
+        }
+    );
 
 }
 
 
 /* =====================================================
-   PILIH OBAT UNTUK PEMAKAIAN MANUAL
+   PILIH OBAT PEMAKAIAN
 ===================================================== */
 
-function selectMedicineForUsage(drug) {
+function selectMedicineForUsage(
+    drug
+) {
 
     selectedUsageDrug =
         drug;
@@ -1127,7 +1295,7 @@ function selectMedicineForUsage(drug) {
 
 
 /* =====================================================
-   SET CURRENT DATE & TIME
+   DATE & TIME
 ===================================================== */
 
 function setCurrentDateTime() {
@@ -1191,7 +1359,7 @@ function setCurrentDateTime() {
 
 
 /* =====================================================
-   SIMPAN PEMAKAIAN MANUAL
+   SIMPAN PEMAKAIAN
 ===================================================== */
 
 function saveUsage() {
@@ -1296,15 +1464,21 @@ function saveUsage() {
         stock[selectedUsageDrug] || 0;
 
 
-    if (quantity > currentStock) {
+    if (
+        quantity >
+        currentStock
+    ) {
 
         alert(
+
             "Stok tidak mencukupi.\n\n" +
+
             "Stok tersedia: " +
             currentStock +
-            "\n" +
-            "Jumlah dipakai: " +
+
+            "\nJumlah dipakai: " +
             quantity
+
         );
 
         return;
@@ -1312,20 +1486,21 @@ function saveUsage() {
     }
 
 
-    /* ==========================
+    /*
        KURANGI STOK
-    ========================== */
+    */
 
     stock[selectedUsageDrug] =
-        currentStock - quantity;
+        currentStock -
+        quantity;
 
 
     saveStock();
 
 
-    /* ==========================
+    /*
        AMBIL RIWAYAT
-    ========================== */
+    */
 
     const history =
         JSON.parse(
@@ -1335,9 +1510,9 @@ function saveUsage() {
         ) || [];
 
 
-    /* ==========================
-       TAMBAHKAN RIWAYAT
-    ========================== */
+    /*
+       SIMPAN RIWAYAT
+    */
 
     history.unshift({
 
@@ -1369,17 +1544,23 @@ function saveUsage() {
 
 
     localStorage.setItem(
+
         "smartTrolleyUsageHistory",
+
         JSON.stringify(history)
+
     );
 
 
     renderStock();
+
     renderFormulary();
+
     renderHistory();
 
 
     alert(
+
         "✅ Pemakaian berhasil dicatat.\n\n" +
 
         "Obat: " +
@@ -1399,6 +1580,7 @@ function saveUsage() {
 
         "\n\nStok sekarang: " +
         stock[selectedUsageDrug]
+
     );
 
 
@@ -1449,7 +1631,7 @@ function cancelUsage() {
 
 
 /* =====================================================
-   RIWAYAT PEMAKAIAN
+   RENDER HISTORY
 ===================================================== */
 
 function renderHistory() {
@@ -1479,7 +1661,8 @@ function renderHistory() {
 
         ? history.filter(
             item =>
-                item.date === filterDate
+                item.date ===
+                filterDate
           )
 
         : history;
@@ -1505,60 +1688,207 @@ function renderHistory() {
     }
 
 
-    filtered.forEach(item => {
+    filtered.forEach(
+        item => {
 
-        const div =
-            document.createElement(
-                "div"
-            );
-
-
-        div.className =
-            "history-item";
+            const div =
+                document.createElement(
+                    "div"
+                );
 
 
-        div.innerHTML = `
-
-            <strong>
-                💊 ${escapeHTML(item.medicine)}
-            </strong>
-
-            <br><br>
-
-            📅 ${formatDate(item.date)}
-
-            <br>
-
-            ⏰ ${escapeHTML(item.time)}
-
-            <br>
-
-            🔢 Jumlah dipakai:
-            <strong>
-                ${item.quantity}
-            </strong>
-
-            <br>
-
-            👤 Pasien:
-            ${escapeHTML(item.patient)}
-
-            <br>
-
-            🛏️ Ruangan / Bed:
-            ${escapeHTML(item.room)}
-
-            <br>
-
-            📝 Keterangan:
-            ${escapeHTML(item.note)}
-
-        `;
+            div.className =
+                "history-item";
 
 
-        list.appendChild(div);
+            div.innerHTML = `
 
-    });
+                <strong>
+                    💊
+                    ${escapeHTML(
+                        item.medicine
+                    )}
+                </strong>
+
+                <br><br>
+
+                📅
+                ${formatDate(
+                    item.date
+                )}
+
+                <br>
+
+                ⏰
+                ${escapeHTML(
+                    item.time
+                )}
+
+                <br>
+
+                🔢 Jumlah dipakai:
+                <strong>
+                    ${item.quantity}
+                </strong>
+
+                <br>
+
+                👤 Pasien:
+                ${escapeHTML(
+                    item.patient
+                )}
+
+                <br>
+
+                🛏️ Ruangan / Bed:
+                ${escapeHTML(
+                    item.room
+                )}
+
+                <br>
+
+                📝 Keterangan:
+                ${escapeHTML(
+                    item.note
+                )}
+
+                <button
+                    class="btn-cancel"
+                    style="margin-top:12px;"
+                    onclick="deleteHistory(${item.id})">
+
+                    🗑️ Hapus Riwayat Ini
+
+                </button>
+
+            `;
+
+
+            list.appendChild(div);
+
+        }
+    );
+
+}
+
+
+/* =====================================================
+   HAPUS SATU RIWAYAT
+===================================================== */
+
+function deleteHistory(id) {
+
+    const confirmDelete =
+        confirm(
+            "Yakin ingin menghapus riwayat pemakaian ini?"
+        );
+
+
+    if (!confirmDelete) {
+
+        return;
+
+    }
+
+
+    const history =
+        JSON.parse(
+            localStorage.getItem(
+                "smartTrolleyUsageHistory"
+            )
+        ) || [];
+
+
+    const updatedHistory =
+        history.filter(
+            item =>
+                item.id !== id
+        );
+
+
+    localStorage.setItem(
+
+        "smartTrolleyUsageHistory",
+
+        JSON.stringify(
+            updatedHistory
+        )
+
+    );
+
+
+    renderHistory();
+
+}
+
+
+/* =====================================================
+   HAPUS SEMUA RIWAYAT
+===================================================== */
+
+function deleteAllHistory() {
+
+    const history =
+        JSON.parse(
+            localStorage.getItem(
+                "smartTrolleyUsageHistory"
+            )
+        ) || [];
+
+
+    if (!history.length) {
+
+        alert(
+            "Belum ada riwayat yang bisa dihapus."
+        );
+
+        return;
+
+    }
+
+
+    const confirmDelete =
+        confirm(
+
+            "⚠️ Yakin ingin menghapus SEMUA riwayat pemakaian?"
+
+        );
+
+
+    if (!confirmDelete) {
+
+        return;
+
+    }
+
+
+    localStorage.removeItem(
+        "smartTrolleyUsageHistory"
+    );
+
+
+    renderHistory();
+
+
+    alert(
+        "✅ Semua riwayat pemakaian berhasil dihapus."
+    );
+
+}
+
+
+/* =====================================================
+   CLEAR FILTER
+===================================================== */
+
+function clearHistoryFilter() {
+
+    document.getElementById(
+        "historyDate"
+    ).value = "";
+
+
+    renderHistory();
 
 }
 
@@ -1567,10 +1897,14 @@ function renderHistory() {
    FORMAT DATE
 ===================================================== */
 
-function formatDate(dateString) {
+function formatDate(
+    dateString
+) {
 
     if (!dateString) {
+
         return "-";
+
     }
 
 
@@ -1578,17 +1912,23 @@ function formatDate(dateString) {
         dateString.split("-");
 
 
-    if (parts.length !== 3) {
+    if (
+        parts.length !== 3
+    ) {
+
         return dateString;
+
     }
 
 
     return (
+
         parts[2] +
         "-" +
         parts[1] +
         "-" +
         parts[0]
+
     );
 
 }
@@ -1631,23 +1971,7 @@ function escapeHTML(text) {
 
 
 /* =====================================================
-   CLEAR HISTORY FILTER
-===================================================== */
-
-function clearHistoryFilter() {
-
-    document.getElementById(
-        "historyDate"
-    ).value = "";
-
-
-    renderHistory();
-
-}
-
-
-/* =====================================================
-   KAMERA BELAKANG
+   OPEN CAMERA
 ===================================================== */
 
 async function openBackCamera() {
@@ -1686,19 +2010,31 @@ async function openBackCamera() {
                     video: {
 
                         facingMode: {
-                            ideal: "environment"
+
+                            ideal:
+                                "environment"
+
                         },
 
                         width: {
-                            ideal: 1920
+
+                            ideal:
+                                1920
+
                         },
 
                         height: {
-                            ideal: 1080
+
+                            ideal:
+                                1080
+
                         },
 
                         frameRate: {
-                            ideal: 30
+
+                            ideal:
+                                30
+
                         }
 
                     },
@@ -1751,7 +2087,7 @@ async function openBackCamera() {
             catch(e) {
 
                 console.log(
-                    "Continuous autofocus tidak tersedia."
+                    "Autofocus tidak tersedia."
                 );
 
             }
@@ -1760,7 +2096,9 @@ async function openBackCamera() {
 
 
         status.innerText =
-            "✅ Kamera aktif. Jangan terlalu dekat. Tempatkan nama obat di kotak hijau.";
+
+            "✅ Kamera aktif. " +
+            "Tempatkan nama obat di kotak hijau.";
 
     }
 
@@ -1770,7 +2108,9 @@ async function openBackCamera() {
 
 
         status.innerText =
-            "❌ Kamera gagal dibuka. Izinkan akses kamera dan gunakan HTTPS/GitHub Pages.";
+
+            "❌ Kamera gagal dibuka. " +
+            "Izinkan akses kamera dan gunakan HTTPS/GitHub Pages.";
 
     }
 
@@ -1812,7 +2152,7 @@ function stopCamera() {
 
 
 /* =====================================================
-   NORMALISASI OCR
+   NORMALIZE TEXT
 ===================================================== */
 
 function normalizeText(text) {
@@ -1852,7 +2192,7 @@ function normalizeText(text) {
 
 
 /* =====================================================
-   NORMALISASI KHUSUS OCR
+   NORMALIZE OCR WORD
 ===================================================== */
 
 function normalizeOCRWord(text) {
@@ -1893,7 +2233,10 @@ function normalizeOCRWord(text) {
    LEVENSHTEIN
 ===================================================== */
 
-function levenshtein(a, b) {
+function levenshtein(
+    a,
+    b
+) {
 
     const matrix = [];
 
@@ -1972,7 +2315,10 @@ function levenshtein(a, b) {
    FUZZY MATCH
 ===================================================== */
 
-function fuzzyMatch(text, keyword) {
+function fuzzyMatch(
+    text,
+    keyword
+) {
 
     const normalizedText =
         normalizeText(text);
@@ -1995,11 +2341,11 @@ function fuzzyMatch(text, keyword) {
 
 
     if (!cleanKeyword) {
+
         return false;
+
     }
 
-
-    /* EXACT */
 
     if (
         cleanText.includes(
@@ -2011,8 +2357,6 @@ function fuzzyMatch(text, keyword) {
 
     }
 
-
-    /* WORD BY WORD */
 
     const words =
         normalizedText
@@ -2090,60 +2434,18 @@ function fuzzyMatch(text, keyword) {
     }
 
 
-    /* SLIDING MATCH */
-
-    if (
-        cleanKeyword.length >= 6 &&
-        cleanText.length >= cleanKeyword.length
-    ) {
-
-        for (
-            let i = 0;
-
-            i <=
-            cleanText.length -
-            cleanKeyword.length;
-
-            i++
-        ) {
-
-            const piece =
-                cleanText.substring(
-                    i,
-                    i + cleanKeyword.length
-                );
-
-
-            const distance =
-                levenshtein(
-                    piece,
-                    cleanKeyword
-                );
-
-
-            if (
-                distance <= 2
-            ) {
-
-                return true;
-
-            }
-
-        }
-
-    }
-
-
     return false;
 
 }
 
 
 /* =====================================================
-   SPECIAL MEDICINE MATCH
+   SPECIAL MATCH
 ===================================================== */
 
-function specialMedicineMatch(text) {
+function specialMedicineMatch(
+    text
+) {
 
     const clean =
         normalizeOCRWord(
@@ -2154,58 +2456,72 @@ function specialMedicineMatch(text) {
     const special = {
 
         "Meylon": [
+
             "MEYLON",
             "MEYL0N",
             "MEYLN",
             "MEYL0"
+
         ],
 
         "Atropine sulfate": [
+
             "ATROPINE",
             "ATROPIN",
             "ATROPINESULFATE",
             "ATROPINESULPHATE",
             "ATROPINESULFAT"
+
         ],
 
         "Amiodarone": [
+
             "AMIODARONE",
             "AMIODARON",
             "AMIDARONE",
             "AMIDARON",
             "AMIODARONEHCL",
             "AMIDARONEHCL"
+
         ],
 
         "Dexamethasone": [
+
             "DEXAMETHASONE",
             "DEXAMETASON",
             "DEXAMETHASON",
             "DEXAMETHAS0NE",
             "DEXAMETHAS0N"
+
         ],
 
         "Ketamine": [
+
             "KETAMINE",
             "KETAMIN",
             "KETAMENE",
             "KETAMlNE"
+
         ],
 
         "Lidocaine": [
+
             "LIDOCAINE",
             "LIDOCAIN",
             "LIGNOCAINE",
             "LIGNOCAIN",
             "LIDOKAIN"
+
         ],
 
         "Calcium gluconate": [
+
             "CALCIUMGLUCONATE",
             "CALCIUMGLUCONAT",
             "CALCIUMGLUC0NATE",
             "CALCIUMGLUKONAT",
             "CALCIUMGLUKONATE"
+
         ]
 
     };
@@ -2247,10 +2563,12 @@ function specialMedicineMatch(text) {
 
 
 /* =====================================================
-   CARI OBAT
+   FIND MEDICINE
 ===================================================== */
 
-function findMedicine(text) {
+function findMedicine(
+    text
+) {
 
     const special =
         specialMedicineMatch(
@@ -2259,7 +2577,9 @@ function findMedicine(text) {
 
 
     if (special) {
+
         return special;
+
     }
 
 
@@ -2278,8 +2598,6 @@ function findMedicine(text) {
 
     ];
 
-
-    /* PRIORITAS */
 
     for (
         const medicine of priority
@@ -2305,8 +2623,6 @@ function findMedicine(text) {
 
     }
 
-
-    /* SEMUA OBAT */
 
     for (
         const medicine in formulary
@@ -2339,13 +2655,15 @@ function findMedicine(text) {
 
 
 /* =====================================================
-   SIAPKAN OCR
+   PREPARE OCR
 ===================================================== */
 
 async function prepareOCR() {
 
     if (ocrReady) {
+
         return;
+
     }
 
 
@@ -2357,17 +2675,24 @@ async function prepareOCR() {
 
     ocrWorker =
         await Tesseract.createWorker(
+
             "eng",
+
             1,
+
             {
 
-                logger: info => {
+                logger:
+                    info => {
 
-                    console.log(info);
+                        console.log(
+                            info
+                        );
 
-                }
+                    }
 
             }
+
         );
 
 
@@ -2389,7 +2714,7 @@ async function prepareOCR() {
 
 
 /* =====================================================
-   CREATE DIGITAL ZOOM
+   CREATE ZOOM CANVAS
 ===================================================== */
 
 function createZoomCanvas(
@@ -2486,10 +2811,12 @@ function createZoomCanvas(
 
 
 /* =====================================================
-   ENHANCE GAMBAR
+   ENHANCE CANVAS
 ===================================================== */
 
-function enhanceCanvas(source) {
+function enhanceCanvas(
+    source
+) {
 
     const canvas =
         document.createElement(
@@ -2561,16 +2888,20 @@ function enhanceCanvas(source) {
         gray =
             (
                 gray - 128
-            ) * 1.8 + 128;
+            ) * 1.8 +
+            128;
 
 
         gray =
             Math.max(
+
                 0,
+
                 Math.min(
                     255,
                     gray
                 )
+
             );
 
 
@@ -2604,7 +2935,9 @@ function enhanceCanvas(source) {
    THRESHOLD
 ===================================================== */
 
-function thresholdCanvas(source) {
+function thresholdCanvas(
+    source
+) {
 
     const canvas =
         document.createElement(
@@ -2933,9 +3266,11 @@ async function scanMedicine() {
 
             medicine =
                 findMedicine(
+
                     text2 +
                     " " +
                     text3
+
                 );
 
         }
@@ -2996,7 +3331,7 @@ async function scanMedicine() {
 
 
         /* ==========================
-           TAMPILKAN OCR
+           OCR TEXT
         ========================== */
 
         document.getElementById(
@@ -3012,7 +3347,7 @@ async function scanMedicine() {
 
 
         /* ==========================
-           OBAT DITEMUKAN
+           FOUND
         ========================== */
 
         if (medicine) {
@@ -3041,8 +3376,10 @@ async function scanMedicine() {
                 <br><br>
 
                 <small>
-                    Tekan Approve untuk menambahkan
-                    1 unit ke stok.
+
+                    Tekan Approve untuk
+                    menambahkan 1 unit ke stok.
+
                 </small>
 
             `;
@@ -3084,7 +3421,7 @@ async function scanMedicine() {
 
 
         /* ==========================
-           OBAT TIDAK DITEMUKAN
+           NOT FOUND
         ========================== */
 
         else {
@@ -3097,34 +3434,33 @@ async function scanMedicine() {
                 "detectedMedicine"
             ).innerHTML = `
 
-                ❌ <strong>
-                Obat belum dikenali.
+                ❌
+                <strong>
+                    Obat belum dikenali.
                 </strong>
 
                 <br><br>
 
-                Kamu bisa:
+                Coba scan lagi.
 
                 <br>
-                • Scan lagi
-                <br>
-                • Atau pilih obat dari
-                <strong>Daftar Formularium</strong>
-                untuk pemakaian manual.
 
-                <br><br>
-
-                Tips OCR:
-
-                <br>
                 • Jarak sekitar 15–30 cm
+
                 <br>
+
                 • Nama obat di dalam kotak hijau
+
                 <br>
+
                 • Cahaya cukup
+
                 <br>
+
                 • Hindari pantulan cahaya
+
                 <br>
+
                 • Kamera jangan digerakkan
 
             `;
@@ -3163,7 +3499,7 @@ async function scanMedicine() {
 
 /* =====================================================
    APPROVE
-   SCAN = TAMBAH STOK +1
+   SCAN → STOK +1
 ===================================================== */
 
 function approveMedicine() {
@@ -3184,8 +3520,8 @@ function approveMedicine() {
 
 
     /*
-       APPROVE HANYA MENAMBAH STOK.
-       TIDAK MENCATAT PEMAKAIAN.
+       APPROVE HANYA
+       MENAMBAH STOK.
     */
 
     stock[medicine] =
@@ -3196,6 +3532,7 @@ function approveMedicine() {
 
 
     renderStock();
+
     renderFormulary();
 
 
@@ -3204,24 +3541,27 @@ function approveMedicine() {
     ).innerHTML = `
 
         ✅ <strong>
-        ${medicine}
+            ${medicine}
         </strong>
 
-        berhasil ditambahkan ke stok.
+        berhasil ditambahkan
+        ke stok.
 
         <br><br>
 
         Stok sekarang:
         <strong>
-        ${stock[medicine]}
+            ${stock[medicine]}
         </strong>
 
         <br><br>
 
         <small>
-        Pemakaian obat dapat dicatat
-        secara manual pada bagian
-        "Pemakaian Obat Manual".
+
+            Pemakaian obat dicatat
+            secara manual pada bagian
+            Pemakaian Obat Manual.
+
         </small>
 
     `;
@@ -3372,4 +3712,4 @@ window.addEventListener(
 </script>
 
 </body>
-</html>
+    </html>
