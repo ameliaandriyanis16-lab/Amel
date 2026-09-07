@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Smart Nursing Trolley V5</title>
+<title>Smart Nursing Trolley V5.1</title>
 
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 
@@ -269,14 +269,12 @@ label{
 
 <header>
     <h1>🚑 Smart Nursing Trolley</h1>
-    <p>Emergency Medication Management System — V5 Fast OCR</p>
+    <p>Emergency Medication Management System — V5.1 Fast OCR</p>
 </header>
 
 <div class="container">
 
-<!-- ================================================= -->
 <!-- CAMERA -->
-<!-- ================================================= -->
 
 <div class="card">
 
@@ -314,9 +312,7 @@ label{
 
 </div>
 
-<!-- ================================================= -->
 <!-- SCAN RESULT -->
-<!-- ================================================= -->
 
 <div class="card">
 
@@ -346,9 +342,7 @@ label{
 
 </div>
 
-<!-- ================================================= -->
 <!-- STOCK -->
-<!-- ================================================= -->
 
 <div class="card">
 
@@ -358,9 +352,7 @@ label{
 
 </div>
 
-<!-- ================================================= -->
-<!-- FORMULARIUM -->
-<!-- ================================================= -->
+<!-- FORMULARY -->
 
 <div class="card">
 
@@ -370,9 +362,7 @@ label{
 
 </div>
 
-<!-- ================================================= -->
 <!-- MANUAL USAGE -->
-<!-- ================================================= -->
 
 <div class="card">
 
@@ -428,9 +418,7 @@ label{
 
 </div>
 
-<!-- ================================================= -->
 <!-- HISTORY -->
-<!-- ================================================= -->
 
 <div class="card">
 
@@ -448,9 +436,7 @@ label{
 
 </div>
 
-<!-- ================================================= -->
-<!-- PRINT LABEL -->
-<!-- ================================================= -->
+<!-- PRINT -->
 
 <div class="card">
 
@@ -521,10 +507,6 @@ let usageHistory =
     JSON.parse(localStorage.getItem("smartTrolleyUsageHistory")) || [];
 
 
-/*
-   Pastikan semua obat ada.
-*/
-
 formulary.forEach(drug => {
 
     if(typeof stock[drug] !== "number"){
@@ -533,10 +515,6 @@ formulary.forEach(drug => {
 
 });
 
-
-/*
-   Bersihkan Alcohol 70% dari storage lama.
-*/
 
 delete stock["Alcohol 70%"];
 delete stock["Alcohol"];
@@ -673,7 +651,6 @@ function changeStock(drug, amount){
     }
 
     saveStock();
-
     renderStock();
 
 }
@@ -729,7 +706,6 @@ function renderUsageSelect(){
             document.createElement("option");
 
         option.value = drug;
-
         option.textContent = drug;
 
         select.appendChild(option);
@@ -796,17 +772,13 @@ function saveUsage(){
 
 
     if(!drug){
-
         alert("Pilih obat terlebih dahulu.");
-
         return;
     }
 
 
     if(!qty || qty < 1){
-
         alert("Jumlah obat tidak valid.");
-
         return;
     }
 
@@ -860,7 +832,6 @@ function saveUsage(){
 
 
     renderStock();
-
     renderHistory();
 
     cancelUsage();
@@ -1031,7 +1002,7 @@ function deleteAllHistory(){
 
 
 /* =====================================================
-   CLEAR HISTORY FILTER
+   CLEAR HISTORY
 ===================================================== */
 
 function clearHistoryFilter(){
@@ -1050,9 +1021,7 @@ async function startCamera(){
     try{
 
         if(cameraStream){
-
             stopCamera();
-
         }
 
 
@@ -1144,9 +1113,10 @@ async function prepareOCR(){
         ocrWorker =
             await Tesseract.createWorker("eng");
 
+
         /*
-          OCR cepat.
-          PSM 7 = single text line.
+          Single line membuat OCR lebih cepat
+          untuk nama obat.
         */
 
         await ocrWorker.setParameters({
@@ -1154,9 +1124,13 @@ async function prepareOCR(){
             tessedit_pageseg_mode:
                 Tesseract.PSM.SINGLE_LINE,
 
-            preserve_interword_spaces:"1"
+            preserve_interword_spaces:"1",
+
+            tessedit_char_whitelist:
+                "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789- "
 
         });
+
 
         ocrReady = true;
 
@@ -1178,13 +1152,15 @@ async function prepareOCR(){
 
 
 /* =====================================================
-   CAPTURE CAMERA FRAME
+   CAPTURE FRAME
+   V5.1
+
+   ZOOM 2X DAN 2.5X TETAP DIPERTAHANKAN
 ===================================================== */
 
-function captureFrame(){
+function captureFrame(zoom = 2){
 
     if(!video.videoWidth){
-
         return null;
     }
 
@@ -1192,14 +1168,16 @@ function captureFrame(){
     const canvas =
         document.createElement("canvas");
 
-    const vw = video.videoWidth;
+    const vw =
+        video.videoWidth;
 
-    const vh = video.videoHeight;
+    const vh =
+        video.videoHeight;
 
 
     /*
-       Fokus area tengah.
-       Tidak OCR seluruh layar.
+      Area scan lebih fokus pada
+      kotak hijau.
     */
 
     const cropW =
@@ -1208,28 +1186,38 @@ function captureFrame(){
     const cropH =
         Math.floor(vh * 0.42);
 
+
     const sx =
-        Math.floor((vw - cropW) / 2);
+        Math.floor(
+            (vw - cropW) / 2
+        );
 
     const sy =
-        Math.floor((vh - cropH) / 2);
+        Math.floor(
+            (vh - cropH) / 2
+        );
 
 
     /*
-       2x enlargement.
+      ZOOM:
+      2x
+      2.5x
     */
 
     canvas.width =
-        cropW * 2;
+        Math.floor(cropW * zoom);
 
     canvas.height =
-        cropH * 2;
+        Math.floor(cropH * zoom);
 
 
     const ctx =
-        canvas.getContext("2d",{
-            willReadFrequently:true
-        });
+        canvas.getContext(
+            "2d",
+            {
+                willReadFrequently:true
+            }
+        );
 
 
     ctx.imageSmoothingEnabled = true;
@@ -1272,9 +1260,12 @@ function enhanceCanvas(source, mode="normal"){
 
 
     const ctx =
-        canvas.getContext("2d",{
-            willReadFrequently:true
-        });
+        canvas.getContext(
+            "2d",
+            {
+                willReadFrequently:true
+            }
+        );
 
 
     ctx.drawImage(
@@ -1299,16 +1290,12 @@ function enhanceCanvas(source, mode="normal"){
 
     for(let i=0;i<data.length;i+=4){
 
-        let r = data[i];
+        const r = data[i];
 
-        let g = data[i+1];
+        const g = data[i+1];
 
-        let b = data[i+2];
+        const b = data[i+2];
 
-
-        /*
-           Grayscale
-        */
 
         let gray =
             0.299*r +
@@ -1319,7 +1306,7 @@ function enhanceCanvas(source, mode="normal"){
         if(mode === "contrast"){
 
             gray =
-                ((gray - 128) * 1.65) + 128;
+                ((gray - 128) * 1.55) + 128;
 
         }
 
@@ -1343,9 +1330,7 @@ function enhanceCanvas(source, mode="normal"){
 
 
         data[i] = gray;
-
         data[i+1] = gray;
-
         data[i+2] = gray;
 
     }
@@ -1367,7 +1352,7 @@ function enhanceCanvas(source, mode="normal"){
    ROTATE
 ===================================================== */
 
-function rotateCanvas(source, degrees){
+function rotateCanvas(source,degrees){
 
     const radians =
         degrees * Math.PI / 180;
@@ -1382,16 +1367,18 @@ function rotateCanvas(source, degrees){
     const canvas =
         document.createElement("canvas");
 
+
     canvas.width =
         Math.floor(
-            source.width * cos +
-            source.height * sin
+            source.width*cos +
+            source.height*sin
         );
+
 
     canvas.height =
         Math.floor(
-            source.width * sin +
-            source.height * cos
+            source.width*sin +
+            source.height*cos
         );
 
 
@@ -1400,17 +1387,18 @@ function rotateCanvas(source, degrees){
 
 
     ctx.translate(
-        canvas.width / 2,
-        canvas.height / 2
+        canvas.width/2,
+        canvas.height/2
     );
+
 
     ctx.rotate(radians);
 
 
     ctx.drawImage(
         source,
-        -source.width / 2,
-        -source.height / 2
+        -source.width/2,
+        -source.height/2
     );
 
 
@@ -1446,7 +1434,7 @@ async function readCanvas(canvas){
 
 
 /* =====================================================
-   NORMALIZE OCR
+   NORMALIZE
 ===================================================== */
 
 function normalizeText(text){
@@ -1486,7 +1474,8 @@ const aliases = {
         "DOPAMINEHCI",
         "DOPAMINEHYDROCHLORIDE",
         "DOPAMINEHYDROCHLORID",
-        "DOPAMINHCL"
+        "DOPAMINHCL",
+        "DOPAMINEH"
     ],
 
     "Dobutamine":[
@@ -1499,7 +1488,8 @@ const aliases = {
         "MIDAZOLAN",
         "MIDAZOLAMHCL",
         "MIDAZOLAMHCI",
-        "MIDAZOLAMHYDROCHLORIDE"
+        "MIDAZOLAMHYDROCHLORIDE",
+        "MIDAZOLAMHYDROCHLORID"
     ],
 
     "Fentanyl":[
@@ -1507,7 +1497,8 @@ const aliases = {
         "FENTANIL",
         "FENTANYLCITRATE",
         "FENTANYLCITRAT",
-        "FENTANYLUM"
+        "FENTANYLUM",
+        "FENTANYL CITRATE"
     ],
 
     "Ketamine":[
@@ -1527,6 +1518,7 @@ const aliases = {
     ],
 
     "D40":[
+        "D40",
         "D40",
         "DEXTROSE40",
         "DEXTROSE"
@@ -1577,7 +1569,7 @@ const aliases = {
 
 
 /* =====================================================
-   FUZZY DISTANCE
+   LEVENSHTEIN
 ===================================================== */
 
 function levenshtein(a,b){
@@ -1591,16 +1583,12 @@ function levenshtein(a,b){
 
 
     for(let i=0;i<=a.length;i++){
-
         matrix[i][0] = i;
-
     }
 
 
     for(let j=0;j<=b.length;j++){
-
         matrix[0][j] = j;
-
     }
 
 
@@ -1651,23 +1639,23 @@ function findDrug(text){
 
 
     /*
-       1. Exact alias
+      EXACT MATCH FIRST
     */
 
     for(const drug of formulary){
 
         const list =
-            aliases[drug] || [
-                drug
-            ];
+            aliases[drug] || [drug];
 
 
         for(const alias of list){
 
+            const target =
+                normalizeText(alias);
+
+
             if(
-                normalized.includes(
-                    normalizeText(alias)
-                )
+                normalized.includes(target)
             ){
 
                 return drug;
@@ -1680,8 +1668,7 @@ function findDrug(text){
 
 
     /*
-       2. Fuzzy matching
-       hanya token yang cukup panjang.
+      CHECK WORDS
     */
 
     const words =
@@ -1691,7 +1678,9 @@ function findDrug(text){
         .map(x =>
             x.replace(/[^A-Z0-9]/g,"")
         )
-        .filter(x => x.length >= 5);
+        .filter(
+            x => x.length >= 5
+        );
 
 
     let bestDrug = null;
@@ -1739,7 +1728,7 @@ function findDrug(text){
 
 
                 if(
-                    ratio < 0.24 &&
+                    ratio < 0.26 &&
                     ratio < bestScore
                 ){
 
@@ -1762,7 +1751,47 @@ function findDrug(text){
 
 
 /* =====================================================
-   FAST SCAN
+   SHOW DETECTED
+===================================================== */
+
+function showDetectedDrug(
+    drug,
+    rawText
+){
+
+    detectedDrug = drug;
+
+
+    scanResult.className =
+        "result success-result";
+
+
+    scanResult.innerHTML =
+        "✅ " +
+        escapeHTML(drug);
+
+
+    approveBtn.style.display =
+        "inline-block";
+
+
+    retryBtn.style.display =
+        "inline-block";
+
+
+    ocrText.textContent =
+        "Terdeteksi dari OCR: " +
+        (rawText || drug);
+
+
+    cameraStatus.innerHTML =
+        "💊 Obat dikenali. Tekan APPROVE untuk menambah stok +1.";
+
+}
+
+
+/* =====================================================
+   FAST SCAN V5.1
 ===================================================== */
 
 async function scanMedicine(){
@@ -1814,18 +1843,33 @@ async function scanMedicine(){
     scanResult.className = "result";
 
     scanResult.textContent =
-        "🔎 Scanning...";
+        "⚡ Scanning cepat...";
 
     ocrText.textContent = "";
 
 
+    let combinedText = "";
+
+
     try{
 
-        const base =
-            captureFrame();
+        /*
+        =================================================
+        PASS 1
+        ZOOM 2X
+        NORMAL
+        =================================================
+        */
+
+        cameraStatus.innerHTML =
+            "🔎 Scan cepat 2×...";
 
 
-        if(!base){
+        const zoom2 =
+            captureFrame(2);
+
+
+        if(!zoom2){
 
             throw new Error(
                 "Frame kamera belum tersedia."
@@ -1834,132 +1878,260 @@ async function scanMedicine(){
         }
 
 
-        /*
-         ==========================================
-         FAST PASS
-         Hanya 3 gambar.
-         ==========================================
-        */
-
-        const images = [
-
-            base,
-
-            enhanceCanvas(
-                base,
-                "contrast"
-            ),
-
-            enhanceCanvas(
-                base,
-                "threshold"
-            )
-
-        ];
+        let text =
+            await readCanvas(
+                zoom2
+            );
 
 
-        let combinedText = "";
+        combinedText +=
+            " " + text;
 
 
-        for(
-            let i=0;
-            i<images.length;
-            i++
-        ){
-
-            const text =
-                await readCanvas(
-                    images[i]
-                );
+        let drug =
+            findDrug(text);
 
 
-            combinedText +=
-                " " + text;
+        if(drug){
 
+            showDetectedDrug(
+                drug,
+                text
+            );
 
-            const drug =
-                findDrug(text);
-
-
-            if(drug){
-
-                showDetectedDrug(
-                    drug,
-                    text
-                );
-
-                return;
-
-            }
+            return;
 
         }
 
 
         /*
-         ==========================================
-         FAST ROTATION FALLBACK
-         Hanya 2 arah.
-         ==========================================
+        =================================================
+        PASS 2
+        ZOOM 2.5X + CONTRAST
+
+        Diprioritaskan untuk tulisan kecil.
+        =================================================
         */
 
-        const rotated1 =
+        cameraStatus.innerHTML =
+            "🔎 Memperjelas tulisan 2.5×...";
+
+
+        const zoom25 =
+            captureFrame(2.5);
+
+
+        const contrast25 =
+            enhanceCanvas(
+                zoom25,
+                "contrast"
+            );
+
+
+        text =
+            await readCanvas(
+                contrast25
+            );
+
+
+        combinedText +=
+            " " + text;
+
+
+        drug =
+            findDrug(text);
+
+
+        if(drug){
+
+            showDetectedDrug(
+                drug,
+                text
+            );
+
+            return;
+
+        }
+
+
+        /*
+        =================================================
+        PASS 3
+        ZOOM 2X + CONTRAST
+
+        Masih cepat.
+        =================================================
+        */
+
+        cameraStatus.innerHTML =
+            "🔎 Optimasi gambar...";
+
+
+        const contrast2 =
+            enhanceCanvas(
+                zoom2,
+                "contrast"
+            );
+
+
+        text =
+            await readCanvas(
+                contrast2
+            );
+
+
+        combinedText +=
+            " " + text;
+
+
+        drug =
+            findDrug(text);
+
+
+        if(drug){
+
+            showDetectedDrug(
+                drug,
+                text
+            );
+
+            return;
+
+        }
+
+
+        /*
+        =================================================
+        FALLBACK 1
+        THRESHOLD 2.5X
+        =================================================
+        */
+
+        const threshold25 =
+            enhanceCanvas(
+                zoom25,
+                "threshold"
+            );
+
+
+        text =
+            await readCanvas(
+                threshold25
+            );
+
+
+        combinedText +=
+            " " + text;
+
+
+        drug =
+            findDrug(text);
+
+
+        if(drug){
+
+            showDetectedDrug(
+                drug,
+                text
+            );
+
+            return;
+
+        }
+
+
+        /*
+        =================================================
+        FALLBACK 2
+        ROTASI
+        HANYA JIKA PASS CEPAT GAGAL
+        =================================================
+        */
+
+        cameraStatus.innerHTML =
+            "🔄 Mencoba sudut tulisan...";
+
+
+        const rotatedLeft =
             rotateCanvas(
-                images[1],
+                contrast25,
                 -10
             );
 
-        const rotated2 =
+
+        text =
+            await readCanvas(
+                rotatedLeft
+            );
+
+
+        combinedText +=
+            " " + text;
+
+
+        drug =
+            findDrug(text);
+
+
+        if(drug){
+
+            showDetectedDrug(
+                drug,
+                text
+            );
+
+            return;
+
+        }
+
+
+        const rotatedRight =
             rotateCanvas(
-                images[1],
+                contrast25,
                 10
             );
 
 
-        for(
-            const image of [
-                rotated1,
-                rotated2
-            ]
-        ){
-
-            const text =
-                await readCanvas(image);
+        text =
+            await readCanvas(
+                rotatedRight
+            );
 
 
-            combinedText +=
-                " " + text;
+        combinedText +=
+            " " + text;
 
 
-            const drug =
-                findDrug(text);
+        drug =
+            findDrug(text);
 
 
-            if(drug){
+        if(drug){
 
-                showDetectedDrug(
-                    drug,
-                    text
-                );
+            showDetectedDrug(
+                drug,
+                text
+            );
 
-                return;
-
-            }
+            return;
 
         }
 
 
         /*
-         ==========================================
-         CURVED LABEL FALLBACK
-         
-         Bukan puluhan variasi.
-         Coba polar unwrap sederhana.
-         ==========================================
+        =================================================
+        FALLBACK 3
+        CURVED / CIRCULAR LABEL
+        =================================================
         */
+
+        cameraStatus.innerHTML =
+            "🔄 Mencoba membaca tulisan melengkung...";
+
 
         const curvedImages =
             createCurvedCandidates(
-                base
+                zoom25
             );
 
 
@@ -1967,15 +2139,17 @@ async function scanMedicine(){
             const image of curvedImages
         ){
 
-            const text =
-                await readCanvas(image);
+            text =
+                await readCanvas(
+                    image
+                );
 
 
             combinedText +=
                 " " + text;
 
 
-            const drug =
+            drug =
                 findDrug(text);
 
 
@@ -1994,23 +2168,29 @@ async function scanMedicine(){
 
 
         /*
-         ==========================================
-         Tidak ditemukan.
-         ==========================================
+        =================================================
+        GAGAL
+        =================================================
         */
 
         scanResult.textContent =
             "❌ Obat belum dikenali";
 
+
         retryBtn.style.display =
             "inline-block";
 
+
         ocrText.textContent =
             "OCR membaca: " +
-            (combinedText.trim() || "tidak ada teks");
+            (
+                combinedText.trim() ||
+                "tidak ada teks"
+            );
+
 
         cameraStatus.innerHTML =
-            "Coba dekatkan nama obat, pastikan fokus dan pencahayaan cukup.";
+            "Coba dekatkan nama obat ke kotak hijau dan pastikan tulisan fokus.";
 
     }
 
@@ -2018,11 +2198,14 @@ async function scanMedicine(){
 
         console.error(error);
 
+
         scanResult.textContent =
             "❌ Scan gagal";
 
+
         retryBtn.style.display =
             "inline-block";
+
 
         cameraStatus.innerHTML =
             "Coba scan kembali.";
@@ -2038,46 +2221,6 @@ async function scanMedicine(){
         loading.style.display = "none";
 
     }
-
-}
-
-
-/* =====================================================
-   SHOW DETECTED
-===================================================== */
-
-function showDetectedDrug(
-    drug,
-    rawText
-){
-
-    detectedDrug = drug;
-
-
-    scanResult.className =
-        "result success-result";
-
-
-    scanResult.innerHTML =
-        "✅ " +
-        escapeHTML(drug);
-
-
-    approveBtn.style.display =
-        "inline-block";
-
-
-    retryBtn.style.display =
-        "inline-block";
-
-
-    ocrText.textContent =
-        "Terdeteksi dari OCR: " +
-        (rawText || drug);
-
-
-    cameraStatus.innerHTML =
-        "💊 Obat dikenali. Tekan APPROVE untuk menambah stok +1.";
 
 }
 
@@ -2139,15 +2282,10 @@ function approveMedicine(){
 
 
 /* =====================================================
-   CURVED / CIRCULAR LABEL UNWRAP
+   CURVED / CIRCULAR LABEL
 ===================================================== */
 
 function createCurvedCandidates(source){
-
-    /*
-       Best-effort polar unwrap.
-       Dipakai hanya jika fast OCR gagal.
-    */
 
     const results = [];
 
@@ -2166,11 +2304,6 @@ function createCurvedCandidates(source){
         source.height / 2;
 
 
-    /*
-       Beberapa radius saja
-       supaya tetap cepat.
-    */
-
     const radiusPairs = [
 
         [
@@ -2186,6 +2319,24 @@ function createCurvedCandidates(source){
     ];
 
 
+    const sourceCtx =
+        source.getContext(
+            "2d",
+            {
+                willReadFrequently:true
+            }
+        );
+
+
+    const sourceData =
+        sourceCtx.getImageData(
+            0,
+            0,
+            source.width,
+            source.height
+        );
+
+
     for(
         const pair of radiusPairs
     ){
@@ -2197,8 +2348,7 @@ function createCurvedCandidates(source){
             pair[1];
 
 
-        const width =
-            900;
+        const width = 900;
 
         const height =
             Math.floor(
@@ -2228,24 +2378,6 @@ function createCurvedCandidates(source){
             );
 
 
-        const sourceCtx =
-            source.getContext(
-                "2d",
-                {
-                    willReadFrequently:true
-                }
-            );
-
-
-        const sourceData =
-            sourceCtx.getImageData(
-                0,
-                0,
-                source.width,
-                source.height
-            );
-
-
         const output =
             ctx.createImageData(
                 width,
@@ -2253,11 +2385,11 @@ function createCurvedCandidates(source){
             );
 
 
-        /*
-          Map annulus → rectangle.
-        */
-
-        for(let x=0;x<width;x++){
+        for(
+            let x=0;
+            x<width;
+            x++
+        ){
 
             const angle =
                 -Math.PI / 2 +
@@ -2272,7 +2404,11 @@ function createCurvedCandidates(source){
                 Math.sin(angle);
 
 
-            for(let y=0;y<height;y++){
+            for(
+                let y=0;
+                y<height;
+                y++
+            ){
 
                 const radius =
                     inner + y;
@@ -2281,30 +2417,30 @@ function createCurvedCandidates(source){
                 const sx =
                     Math.round(
                         cx +
-                        radius * cos
+                        radius*cos
                     );
 
 
                 const sy =
                     Math.round(
                         cy +
-                        radius * sin
+                        radius*sin
                     );
 
 
                 const di =
-                    (y * width + x) * 4;
+                    (y*width+x)*4;
 
 
                 if(
-                    sx >= 0 &&
-                    sx < source.width &&
-                    sy >= 0 &&
-                    sy < source.height
+                    sx>=0 &&
+                    sx<source.width &&
+                    sy>=0 &&
+                    sy<source.height
                 ){
 
                     const si =
-                        (sy * source.width + sx) * 4;
+                        (sy*source.width+sx)*4;
 
 
                     output.data[di] =
@@ -2414,7 +2550,7 @@ function printLabel(){
 
 
 /* =====================================================
-   UPDATE PRINT PREVIEW
+   PRINT PREVIEW
 ===================================================== */
 
 document
@@ -2492,4 +2628,4 @@ window.addEventListener(
 </script>
 
 </body>
-    </html>
+</html>
